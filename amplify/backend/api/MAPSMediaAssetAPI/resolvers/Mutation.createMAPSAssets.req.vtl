@@ -1,0 +1,14 @@
+{
+  "version": "2017-02-28",
+  "operation": "PutItem",
+  "key": {
+    "bucketObjKey": $util.dynamodb.toDynamoDBJson($ctx.args.input.bucketObjKey),
+  },
+  "attributeValues": $util.dynamodb.toMapValuesJson($ctx.args.input),
+  "condition": {
+    "expression": "attribute_not_exists(#bucketObjKey)",
+    "expressionNames": {
+      "#bucketObjKey": "bucketObjKey",
+    },
+  },
+}

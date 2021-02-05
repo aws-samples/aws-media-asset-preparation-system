@@ -1,0 +1,1943 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "API Gateway resource stack creation using Amplify CLI",
+    
+    "Parameters": {
+        "authRoleName": {
+            "Type":  "String"
+        },
+        "unauthRoleName": {
+            "Type":  "String"
+        },
+        "env": {
+            "Type": "String"
+        },
+        "authmapsauthcontrolsUserPoolId": {
+            "Type": "String"
+        },
+        "functionMAPSRequestProcessingName": {
+            "Type": "String",
+            "Default": "functionMAPSRequestProcessingName"
+        },
+        "functionMAPSRequestProcessingArn": {
+            "Type": "String",
+            "Default": "functionMAPSRequestProcessingArn"
+        }
+    },
+     "Conditions": {
+        "ShouldNotCreateEnvResources": {
+            "Fn::Equals": [
+                {
+                    "Ref": "env"
+                },
+                "NONE"
+            ]
+        }
+    },
+    "Resources": {
+      "MAPSFrontEndAPI": {
+        "Type": "AWS::ApiGateway::RestApi",
+        "Properties": {
+          "Description": "",
+          "Name": "MAPSFrontEndAPI",
+          "Body": {
+            "swagger": "2.0",
+            "info": {
+              "version": "2018-05-24T17:52:00Z",
+              "title": "MAPSFrontEndAPI"
+            },
+            "host": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "apigateway.",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ".amazonaws.com"
+                  ]
+                ]
+            },
+            "basePath": "/maps",
+            "schemes": [ "https" ],
+            "paths": {
+                "/" : {
+                    "get" : {
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "prefix",
+                        "in" : "query",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "name" : "bucketName",
+                        "in" : "query",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "name" : "nextIdToken",
+                        "in" : "query",
+                        "required" : false,
+                        "type" : "string"
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/CommonModel"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                          "uri": {
+                              "Fn::Join": [
+                                "",
+                                [
+                                  "arn:aws:apigateway:",
+                                  {
+                                    "Ref": "AWS::Region"
+                                  },
+                                  ":lambda:path/2015-03-31/functions/",
+                                  {
+                                      "Ref": "functionMAPSRequestProcessingArn"
+                                  },
+                                  "/invocations"
+                                ]
+                              ]
+                            },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT",
+                        "type" : "aws_proxy"
+                      }
+                    },
+                    "options" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Methods" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Headers" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "x-amazon-apigateway-integration" : {
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Methods" : "'GET,OPTIONS'",
+                              "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "requestTemplates" : {
+                          "application/json" : "{\"statusCode\": 200}"
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "type" : "mock"
+                      }
+                    }
+                },
+                "/admin" : {
+                    "post" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "name" : "operation",
+                        "in" : "query",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "in" : "body",
+                        "name" : "Empty",
+                        "required" : true,
+                        "schema" : {
+                          "$ref" : "#/definitions/Empty"
+                        }
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                        "uri": {
+                          "Fn::Join": [
+                          "",
+                          [
+                              "arn:aws:apigateway:",
+                              {
+                              "Ref": "AWS::Region"
+                              },
+                              ":lambda:path/2015-03-31/functions/",
+                              {
+                                  "Ref": "functionMAPSRequestProcessingArn"
+                              },
+                              "/invocations"
+                          ]
+                          ]
+                      },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200"
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT",
+                        "type" : "aws_proxy"
+                      }
+                    },
+                    "options" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Methods" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Headers" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "x-amazon-apigateway-integration" : {
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                              "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "requestTemplates" : {
+                          "application/json" : "{\"statusCode\": 200}"
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "type" : "mock"
+                      }
+                    }
+                },
+                "/bucket" : {
+                    "get" : {
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : false,
+                        "type" : "string"
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                        "uri": {
+                              "Fn::Join": [
+                              "",
+                              [
+                                  "arn:aws:apigateway:",
+                                  {
+                                  "Ref": "AWS::Region"
+                                  },
+                                  ":lambda:path/2015-03-31/functions/",
+                                  {
+                                      "Ref": "functionMAPSRequestProcessingArn"
+                                  },
+                                  "/invocations"
+                              ]
+                              ]
+                          },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200"
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT",
+                        "type" : "aws_proxy"
+                      }
+                    },
+                    "options" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Methods" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Headers" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "x-amazon-apigateway-integration" : {
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                              "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "requestTemplates" : {
+                          "application/json" : "{\"statusCode\": 200}"
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "type" : "mock"
+                      }
+                    }
+                },
+                "/delete" : {
+                    "post" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : true,
+                        "type" : "string"
+                      }, {
+                        "in" : "body",
+                        "name" : "CommonModel",
+                        "required" : true,
+                        "schema" : {
+                          "$ref" : "#/definitions/CommonModel"
+                        }
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/CommonModel"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        },
+                        "401" : {
+                          "description" : "401 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/CommonModel"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                        "uri": {
+                              "Fn::Join": [
+                              "",
+                              [
+                                  "arn:aws:apigateway:",
+                                  {
+                                  "Ref": "AWS::Region"
+                                  },
+                                  ":lambda:path/2015-03-31/functions/",
+                                  {
+                                      "Ref": "functionMAPSRequestProcessingArn"
+                                  },
+                                  "/invocations"
+                              ]
+                              ]
+                          },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200"
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT",
+                        "type" : "aws_proxy"
+                      }
+                    },
+                    "options" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Methods" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Headers" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "x-amazon-apigateway-integration" : {
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Methods" : "'DELETE,OPTIONS'",
+                              "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "requestTemplates" : {
+                          "application/json" : "{\"statusCode\": 200}"
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "type" : "mock"
+                      }
+                    }
+                },
+                "/download" : {
+                    "post" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : true,
+                        "type" : "string"
+                      }, {
+                        "in" : "body",
+                        "name" : "CommonModel",
+                        "required" : true,
+                        "schema" : {
+                          "$ref" : "#/definitions/CommonModel"
+                        }
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/CommonModel"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        },
+                        "401" : {
+                          "description" : "401 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/CommonModel"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                        "uri": {
+                              "Fn::Join": [
+                              "",
+                              [
+                                  "arn:aws:apigateway:",
+                                  {
+                                  "Ref": "AWS::Region"
+                                  },
+                                  ":lambda:path/2015-03-31/functions/",
+                                  {
+                                      "Ref": "functionMAPSRequestProcessingArn"
+                                  },
+                                  "/invocations"
+                              ]
+                              ]
+                          },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200"
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT",
+                        "type" : "aws_proxy"
+                      }
+                    },
+                    "options" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Methods" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Headers" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "x-amazon-apigateway-integration" : {
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Methods" : "'OPTIONS,POST'",
+                              "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "requestTemplates" : {
+                          "application/json" : "{\"statusCode\": 200}"
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "type" : "mock"
+                      }
+                    }
+                },
+                "/folder" : {
+                    "get" : {
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "prefix",
+                        "in" : "query",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "name" : "bucketName",
+                        "in" : "query",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "name" : "nextIdToken",
+                        "in" : "query",
+                        "required" : false,
+                        "type" : "string"
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                        "uri": {
+                              "Fn::Join": [
+                              "",
+                              [
+                                  "arn:aws:apigateway:",
+                                  {
+                                  "Ref": "AWS::Region"
+                                  },
+                                  ":lambda:path/2015-03-31/functions/",
+                                  {
+                                      "Ref": "functionMAPSRequestProcessingArn"
+                                  },
+                                  "/invocations"
+                              ]
+                              ]
+                          },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200"
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT",
+                        "type" : "aws_proxy"
+                      }
+                    },
+                    "post" : {
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : false,
+                        "type" : "string"
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                        "uri": {
+                              "Fn::Join": [
+                              "",
+                              [
+                                  "arn:aws:apigateway:",
+                                  {
+                                  "Ref": "AWS::Region"
+                                  },
+                                  ":lambda:path/2015-03-31/functions/",
+                                  {
+                                      "Ref": "functionMAPSRequestProcessingArn"
+                                  },
+                                  "/invocations"
+                              ]
+                              ]
+                          },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200"
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT",
+                        "type" : "aws_proxy"
+                      }
+                    },
+                    "options" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Methods" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Headers" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "x-amazon-apigateway-integration" : {
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                              "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "requestTemplates" : {
+                          "application/json" : "{\"statusCode\": 200}"
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "type" : "mock"
+                      }
+                    }
+                },
+                "/folder/permissions" : {
+                    "get" : {
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "folderKey",
+                        "in" : "query",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "name" : "bucketName",
+                        "in" : "query",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : false,
+                        "type" : "string"
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                        "type" : "aws_proxy",
+                        "uri": {
+                            "Fn::Join": [
+                            "",
+                            [
+                                "arn:aws:apigateway:",
+                                {
+                                "Ref": "AWS::Region"
+                                },
+                                ":lambda:path/2015-03-31/functions/",
+                                {
+                                    "Ref": "functionMAPSRequestProcessingArn"
+                                },
+                                "/invocations"
+                            ]
+                            ]
+                        },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200"
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT"
+                      }
+                    },
+                    "post" : {
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : false,
+                        "type" : "string"
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                        "type" : "aws_proxy",
+                        "uri": {
+                            "Fn::Join": [
+                            "",
+                            [
+                                "arn:aws:apigateway:",
+                                {
+                                "Ref": "AWS::Region"
+                                },
+                                ":lambda:path/2015-03-31/functions/",
+                                {
+                                    "Ref": "functionMAPSRequestProcessingArn"
+                                },
+                                "/invocations"
+                            ]
+                            ]
+                        },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200"
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT"
+                      }
+                    },
+                    "options" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Methods" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Headers" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "x-amazon-apigateway-integration" : {
+                        "type" : "mock",
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                              "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "requestTemplates" : {
+                          "application/json" : "{\"statusCode\": 200}"
+                        },
+                        "passthroughBehavior" : "when_no_match"
+                      }
+                    }
+                },
+                "/move" : {
+                    "post" : {
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : false,
+                        "type" : "string"
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                        "uri": {
+                            "Fn::Join": [
+                            "",
+                            [
+                                "arn:aws:apigateway:",
+                                {
+                                "Ref": "AWS::Region"
+                                },
+                                ":lambda:path/2015-03-31/functions/",
+                                {
+                                    "Ref": "functionMAPSRequestProcessingArn"
+                                },
+                                "/invocations"
+                            ]
+                            ]
+                        },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT",
+                        "type" : "aws_proxy"
+                      }
+                    },
+                    "options" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Methods" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Headers" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "x-amazon-apigateway-integration" : {
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Methods" : "'OPTIONS,POST'",
+                              "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "requestTemplates" : {
+                          "application/json" : "{\"statusCode\": 200}"
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "type" : "mock"
+                      }
+                    }
+                },
+                "/object" : {
+                    "get" : {
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "key",
+                        "in" : "query",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "name" : "bucketName",
+                        "in" : "query",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : true,
+                        "type" : "string"
+                      }, {
+                        "name" : "version",
+                        "in" : "query",
+                        "required" : false,
+                        "type" : "string"
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                        "uri": {
+                              "Fn::Join": [
+                              "",
+                              [
+                                  "arn:aws:apigateway:",
+                                  {
+                                  "Ref": "AWS::Region"
+                                  },
+                                  ":lambda:path/2015-03-31/functions/",
+                                  {
+                                      "Ref": "functionMAPSRequestProcessingArn"
+                                  },
+                                  "/invocations"
+                              ]
+                              ]
+                          },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200"
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT",
+                        "type" : "aws_proxy"
+                      }
+                    },
+                    "post" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "in" : "body",
+                        "name" : "CommonModel",
+                        "required" : true,
+                        "schema" : {
+                          "$ref" : "#/definitions/CommonModel"
+                        }
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                        "uri": {
+                              "Fn::Join": [
+                              "",
+                              [
+                                  "arn:aws:apigateway:",
+                                  {
+                                  "Ref": "AWS::Region"
+                                  },
+                                  ":lambda:path/2015-03-31/functions/",
+                                  {
+                                      "Ref": "functionMAPSRequestProcessingArn"
+                                  },
+                                  "/invocations"
+                              ]
+                              ]
+                          },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200"
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT",
+                        "type" : "aws_proxy"
+                      }
+                    },
+                    "options" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Methods" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Headers" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "x-amazon-apigateway-integration" : {
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                              "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "requestTemplates" : {
+                          "application/json" : "{\"statusCode\": 200}"
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "type" : "mock"
+                      }
+                    }
+                },
+                "/rename" : {
+                    "post" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : true,
+                        "type" : "string"
+                      }, {
+                        "in" : "body",
+                        "name" : "CommonModel",
+                        "required" : true,
+                        "schema" : {
+                          "$ref" : "#/definitions/CommonModel"
+                        }
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/CommonModel"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        },
+                        "401" : {
+                          "description" : "401 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/CommonModel"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                        "uri": {
+                              "Fn::Join": [
+                              "",
+                              [
+                                  "arn:aws:apigateway:",
+                                  {
+                                  "Ref": "AWS::Region"
+                                  },
+                                  ":lambda:path/2015-03-31/functions/",
+                                  {
+                                      "Ref": "functionMAPSRequestProcessingArn"
+                                  },
+                                  "/invocations"
+                              ]
+                              ]
+                          },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT",
+                        "type" : "aws_proxy"
+                      }
+                    },
+                    "options" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Methods" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Headers" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "x-amazon-apigateway-integration" : {
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Methods" : "'OPTIONS,POST'",
+                              "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "requestTemplates" : {
+                          "application/json" : "{\"statusCode\": 200}"
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "type" : "mock"
+                      }
+                    }
+                },
+                "/upload" : {
+                    "post" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "parameters" : [ {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : false,
+                        "type" : "string"
+                      }, {
+                        "in" : "body",
+                        "name" : "CommonModel",
+                        "required" : true,
+                        "schema" : {
+                          "$ref" : "#/definitions/CommonModel"
+                        }
+                      } ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/CommonModel"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        },
+                        "401" : {
+                          "description" : "401 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/CommonModel"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                      } ],
+                      "x-amazon-apigateway-integration" : {
+                        "uri": {
+                              "Fn::Join": [
+                              "",
+                              [
+                                  "arn:aws:apigateway:",
+                                  {
+                                  "Ref": "AWS::Region"
+                                  },
+                                  ":lambda:path/2015-03-31/functions/",
+                                  {
+                                      "Ref": "functionMAPSRequestProcessingArn"
+                                  },
+                                  "/invocations"
+                              ]
+                              ]
+                          },
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT",
+                        "type" : "aws_proxy"
+                      }
+                    },
+                    "options" : {
+                      "consumes" : [ "application/json" ],
+                      "produces" : [ "application/json" ],
+                      "responses" : {
+                        "200" : {
+                          "description" : "200 response",
+                          "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                          },
+                          "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Methods" : {
+                              "type" : "string"
+                            },
+                            "Access-Control-Allow-Headers" : {
+                              "type" : "string"
+                            }
+                          }
+                        }
+                      },
+                      "x-amazon-apigateway-integration" : {
+                        "responses" : {
+                          "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                              "method.response.header.Access-Control-Allow-Methods" : "'OPTIONS,POST'",
+                              "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                          }
+                        },
+                        "requestTemplates" : {
+                          "application/json" : "{\"statusCode\": 200}"
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "type" : "mock"
+                      }
+                    }
+                },
+                "/user" : {
+                    "options" : {
+                        "consumes" : [ "application/json" ],
+                        "produces" : [ "application/json" ],
+                        "responses" : {
+                        "200" : {
+                            "description" : "200 response",
+                            "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                            },
+                            "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                                "type" : "string"
+                            },
+                            "Access-Control-Allow-Methods" : {
+                                "type" : "string"
+                            },
+                            "Access-Control-Allow-Headers" : {
+                                "type" : "string"
+                            }
+                            }
+                        }
+                        },
+                        "x-amazon-apigateway-integration" : {
+                        "responses" : {
+                            "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                                "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                                "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                            }
+                        },
+                        "requestTemplates" : {
+                            "application/json" : "{\"statusCode\": 200}"
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "type" : "mock"
+                        }
+                    }
+                },
+                "/user/groups" : {
+                    "get" : {
+                        "produces" : [ "application/json" ],
+                        "parameters" : [ {
+                        "name" : "Authorization",
+                        "in" : "header",
+                        "required" : false,
+                        "type" : "string"
+                        } ],
+                        "responses" : {
+                        "200" : {
+                            "description" : "200 response",
+                            "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                            },
+                            "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                                "type" : "string"
+                            }
+                            }
+                        }
+                        },
+                        "security" : [ {
+                        "maps-cognito-authorizer" : [ ]
+                        } ],
+                        "x-amazon-apigateway-integration" : {
+                            "uri": {
+                                "Fn::Join": [
+                                "",
+                                [
+                                    "arn:aws:apigateway:",
+                                    {
+                                    "Ref": "AWS::Region"
+                                    },
+                                    ":lambda:path/2015-03-31/functions/",
+                                    {
+                                        "Ref": "functionMAPSRequestProcessingArn"
+                                    },
+                                    "/invocations"
+                                ]
+                                ]
+                            },
+                            "responses" : {
+                            "default" : {
+                            "statusCode" : "200"
+                            }
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "httpMethod" : "POST",
+                        "contentHandling" : "CONVERT_TO_TEXT",
+                        "type" : "aws_proxy"
+                        }
+                    },
+                    "options" : {
+                        "consumes" : [ "application/json" ],
+                        "produces" : [ "application/json" ],
+                        "responses" : {
+                        "200" : {
+                            "description" : "200 response",
+                            "schema" : {
+                            "$ref" : "#/definitions/Empty"
+                            },
+                            "headers" : {
+                            "Access-Control-Allow-Origin" : {
+                                "type" : "string"
+                            },
+                            "Access-Control-Allow-Methods" : {
+                                "type" : "string"
+                            },
+                            "Access-Control-Allow-Headers" : {
+                                "type" : "string"
+                            }
+                            }
+                        }
+                        },
+                        "x-amazon-apigateway-integration" : {
+                        "responses" : {
+                            "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                                "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                                "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                            }
+                        },
+                        "requestTemplates" : {
+                            "application/json" : "{\"statusCode\": 200}"
+                        },
+                        "passthroughBehavior" : "when_no_match",
+                        "type" : "mock"
+                        }
+                    }
+                }
+            },
+            "securityDefinitions" : {
+                "maps-cognito-authorizer" : {
+                  "type" : "apiKey",
+                  "name" : "Authorization",
+                  "in" : "header",
+                  "x-amazon-apigateway-authtype" : "cognito_user_pools",
+                  "x-amazon-apigateway-authorizer" : {
+                    "providerARNs" : [ 
+                        {
+                            "Fn::Sub":[
+                                "arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${userpoolid}",
+                                {
+                                   "userpoolid":{
+                                      "Ref":"authmapsauthcontrolsUserPoolId"
+                                   }
+                                }
+                             ]
+                        }
+                    ],
+                    "type" : "cognito_user_pools"
+                  }
+                }
+            },
+            "definitions" : {
+                "Empty" : {
+                  "type" : "object",
+                  "title" : "Empty Schema"
+                },
+                "CommonModel" : {
+                  "type" : "object",
+                  "properties" : {
+                    "body" : {
+                      "type" : "string"
+                    }
+                  },
+                  "title" : "CommonModel"
+                }
+              },
+            "x-amazon-apigateway-gateway-responses" : {
+                "DEFAULT_5XX" : {
+                  "responseParameters" : {
+                    "gatewayresponse.header.Access-Control-Allow-Methods" : "'GET,OPTIONS,POST'",
+                    "gatewayresponse.header.Access-Control-Allow-Origin" : "'*'",
+                    "gatewayresponse.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                  }
+                },
+                "DEFAULT_4XX" : {
+                  "responseParameters" : {
+                    "gatewayresponse.header.Access-Control-Allow-Methods" : "'GET,OPTIONS,POST'",
+                    "gatewayresponse.header.Access-Control-Allow-Origin" : "'*'",
+                    "gatewayresponse.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                  }
+                }
+            }
+          },
+          "FailOnWarnings": true
+        }
+    },
+
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIGet": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/GET/"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIAdminPost": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/POST/admin"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIBucketGet": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/GET/bucket"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIDeletePost": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/POST/delete"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIDownloadPost": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/POST/download"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIFolderGet": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/GET/folder"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIFolderPost": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/POST/folder"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIFolderPermissionsGet": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/GET/folder/permissions"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIFolderPermissionsPost": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/POST/folder/permissions"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIMovePost": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/POST/move"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIObjectGet": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/GET/object"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIObjectPost": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/POST/object"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIRenamePost": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/POST/rename"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIUploadPost": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/POST/upload"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIUserGroupsGet": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/GET/user/groups"
+                    }
+                ]
+            }
+        }
+    },
+
+      "DeploymentAPIGWMAPSFrontEndAPI": {
+        "Type": "AWS::ApiGateway::Deployment",
+        "Properties": {
+          "Description": "The Development stage deployment of your API.",
+          "StageName": {
+            "Fn::If": [
+              "ShouldNotCreateEnvResources",
+              "Prod", 
+              {
+                "Ref": "env"
+              } 
+            ]
+          },
+          "RestApiId": {
+            "Ref": "MAPSFrontEndAPI"
+          }
+        }
+      }
+    },
+    "Outputs": {
+        "RootUrl": {
+            "Description": "Root URL of the API gateway",
+            "Value": {"Fn::Join": ["", ["https://", {"Ref": "MAPSFrontEndAPI"}, ".execute-api.", {"Ref": "AWS::Region"}, ".amazonaws.com/", {"Fn::If": ["ShouldNotCreateEnvResources","Prod", {"Ref": "env"} ]}]]}
+        },
+        "ApiName": {
+          "Description": "API Friendly name",
+          "Value": "MAPSFrontEndAPI"
+        },
+        "ApiId": {
+          "Description": "API ID (prefix of API URL)",
+          "Value": {"Ref": "MAPSFrontEndAPI"}
+        }
+    }
+  }

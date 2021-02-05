@@ -1,0 +1,7 @@
+{
+  "version": "2018-05-29",
+  "operation": "Scan",
+  "filter": #if($ctx.prev.result.arguments.filter) $util.transform.toDynamoDBFilterExpression($ctx.prev.result.arguments.filter) #else null #end,
+  "limit": $util.defaultIfNull($ctx.prev.result.limit, 20),
+  "nextToken": $util.toJson($util.defaultIfNullOrEmpty($ctx.prev.result.nextToken, null)),
+}

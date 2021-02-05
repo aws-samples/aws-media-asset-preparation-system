@@ -1,0 +1,274 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "MAPS Additional Resources Stack.",
+    "Parameters": {
+        "env": {
+            "Type": "String"
+        },
+        "functionmapsdeletefolderhandlerArn": {
+            "Type": "String"
+        }
+    },
+    "Conditions": {
+        "ShouldNotCreateEnvResources": {
+            "Fn::Equals": [
+                {
+                    "Ref": "env"
+                },
+                "NONE"
+            ]
+        }
+    },
+    "Resources": {
+        "MAPSQueue": {
+            "Type": "AWS::SQS::Queue",
+            "Properties": {
+                "DelaySeconds": 0,
+                "MaximumMessageSize": 262144,
+                "MessageRetentionPeriod": 900,
+                "QueueName": {
+                    "Fn::Sub": [
+                        "MAPS-Thumbnail-Processing-Queue-${env}",
+                        {
+                            "env": {
+                                "Ref": "env"
+                            }
+                        }
+                    ]
+                },
+                "ReceiveMessageWaitTimeSeconds": 0,
+                "VisibilityTimeout": 900
+            }
+        },
+
+        "MAPSQueuePolicy": {
+            "Type": "AWS::SQS::QueuePolicy",
+            "DependsOn": ["MAPSQueue"],
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "s3.amazonaws.com",
+                                "AWS": {
+                                    "Fn::Sub": [
+                                        "arn:aws:iam::${AWS::AccountId}:root",
+                                        {}
+                                    ]
+                                }
+                            },
+                            "Action": "SQS:SendMessage",
+                            "Resource": {
+                                "Fn::GetAtt": [
+                                    "MAPSQueue",
+                                    "Arn"
+                                ]
+                            },
+                            "Condition": {
+                                "StringEquals": {
+                                    "aws:SourceAccount": {
+                                        "Ref": "AWS::AccountId"
+                                    }
+                                },
+                                "ArnLike": {
+                                    "aws:SourceArn": "arn:aws:s3:*:*:*"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "Queues": [
+                    {
+                        "Ref": "MAPSQueue"
+                    }
+                ]
+            }
+        },
+
+        "S3EventNotificationPermission": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "FunctionName": {
+                    "Ref": "functionmapsdeletefolderhandlerArn"
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "s3.amazonaws.com",
+                "SourceAccount": {
+                    "Ref": "AWS::AccountId"
+                },
+                "SourceArn": "arn:aws:s3:::*"
+            }
+        },
+
+        "SSMOutputBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Sub": [
+                        "ssm-output-${AWS::Region}-${AWS::AccountId}-${env}",
+                        {
+                            "env": {
+                                "Ref": "env"
+                            }
+                        }
+                    ]
+                },
+                "AccessControl": "Private",
+                "PublicAccessBlockConfiguration": {
+                    "BlockPublicAcls" : "TRUE",
+                    "BlockPublicPolicy" : "TRUE",
+                    "IgnorePublicAcls" : "TRUE",
+                    "RestrictPublicBuckets" : "TRUE"
+                }
+            }
+        },
+
+        "MediaMetadataBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Sub": [
+                        "maps-metadata-${AWS::Region}-${AWS::AccountId}-${env}",
+                        {
+                            "env": {
+                                "Ref": "env"
+                            }
+                        }
+                    ]
+                },
+                "AccessControl": "Private",
+                "PublicAccessBlockConfiguration": {
+                    "BlockPublicAcls" : "TRUE",
+                    "BlockPublicPolicy" : "TRUE",
+                    "IgnorePublicAcls" : "TRUE",
+                    "RestrictPublicBuckets" : "TRUE"
+                }
+            }
+        },
+
+        "MediaBucket": {
+            "Type": "AWS::S3::Bucket",
+            "DependsOn": [
+                "MAPSQueuePolicy",
+                "S3EventNotificationPermission"
+            ],
+            "Properties": {
+                "BucketName": {
+                    "Fn::Sub": [
+                        "maps-media-${AWS::Region}-${AWS::AccountId}-${env}",
+                        {
+                            "env": {
+                                "Ref": "env"
+                            }
+                        }
+                    ]
+                },
+                "AccessControl": "Private",
+                "CorsConfiguration": {
+                    "CorsRules": [
+                        {
+                            "AllowedHeaders": [
+                                "*"
+                            ],
+                            "AllowedMethods": [
+                                "GET",
+                                "HEAD",
+                                "PUT",
+                                "POST",
+                                "DELETE"
+                            ],
+                            "AllowedOrigins": [
+                                "*"
+                            ],
+                            "ExposedHeaders": [
+                                "ETag"
+                            ]
+                        }
+                    ]
+                },
+                "NotificationConfiguration": {
+                    "QueueConfigurations": [
+                        {
+                            "Event": "s3:ObjectCreated:Put",
+                            "Queue": {
+                                "Fn::GetAtt": [
+                                    "MAPSQueue",
+                                    "Arn"
+                                ]
+                            }
+                        },
+                        {
+                            "Event": "s3:ObjectCreated:Post",
+                            "Queue": {
+                                "Fn::GetAtt": [
+                                    "MAPSQueue",
+                                    "Arn"
+                                ]
+                            }
+                        },
+                        {
+                            "Event": "s3:ObjectCreated:CompleteMultipartUpload",
+                            "Queue": {
+                                "Fn::GetAtt": [
+                                    "MAPSQueue",
+                                    "Arn"
+                                ]
+                            }
+                        }
+                    ],
+                    "LambdaConfigurations": [
+                        {
+                            "Event": "s3:ObjectRemoved:*",
+                            "Filter": {
+                                "S3Key": {
+                                    "Rules": [
+                                        {
+                                            "Name": "Suffix",
+                                            "Value": "/"
+                                        }
+                                    ]
+                                }
+                            },
+                            "Function": {
+                                "Ref": "functionmapsdeletefolderhandlerArn"
+                            }
+                        }
+                    ]
+                },
+                "PublicAccessBlockConfiguration": {
+                    "BlockPublicAcls" : "TRUE",
+                    "BlockPublicPolicy" : "TRUE",
+                    "IgnorePublicAcls" : "TRUE",
+                    "RestrictPublicBuckets" : "TRUE"
+                }
+            }
+        }
+    },
+
+    "Outputs": {
+        "MAPSQueueArn": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "MAPSQueue",
+                    "Arn"
+                ]
+            }
+        },
+        "SSMOutputBucketName": {
+            "Value": {
+                "Ref": "SSMOutputBucket"
+            }
+        },
+        "MediaMetadataBucketName": {
+            "Value": {
+                "Ref": "MediaMetadataBucket"
+            }
+        },
+        "MediaBucketName": {
+            "Value": {
+                "Ref": "MediaBucket"
+            }
+        }
+    }
+}

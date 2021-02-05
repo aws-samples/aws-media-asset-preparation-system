@@ -1,0 +1,16 @@
+## In order to retain the same execution behavior for 2017-02-28 templates
+## you might have to uncomment the following code below.
+## For more details about changes from 2017-02-28 to 2018-05-29 see 
+## https://docs-aws.amazon.com/appsync/latest/devguide/resolver-mapping-template-changelog.html
+##
+## #if($ctx.error)
+##   $util.error($ctx.error.message, $ctx.error.type)
+## #end
+## #if($util.isNull($ctx.result))
+##   #return
+## #end
+#if($ctx.prev.result.arguments.allow)
+	$util.toJson($ctx.result)
+#else
+	$util.toJson({"items": []})
+#end

@@ -1,0 +1,32 @@
+version: 1
+backend:
+  phases:
+    preBuild:
+      commands:
+        - export BASE_PATH=$(pwd)
+        - yum install -y gcc openssl-devel bzip2-devel libffi-devel python3.8-pip
+        - cd /opt && wget https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tgz
+        - cd /opt && tar xzf Python-3.8.2.tgz 
+        - cd /opt/Python-3.8.2 && ./configure --enable-optimizations
+        - cd /opt/Python-3.8.2 && make altinstall
+        - pip3.8 install --user pipenv
+        - ln -fs /usr/local/bin/python3.8 /usr/bin/python3
+        - ln -fs /usr/local/bin/pip3.8 /usr/bin/pip3
+        - cd $BASE_PATH
+        - '# Execute Amplify CLI with the helper script'
+        - amplifyPush --simple
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: build
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*

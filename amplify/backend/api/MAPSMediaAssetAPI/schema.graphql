@@ -1,0 +1,241 @@
+input CreateMAPSAssetsInput {
+	bucketObjKey: String!
+	prefixLoc: String
+	assetId: String
+	creationDate: AWSDateTime
+	lastModifiedDate: AWSDateTime
+	thumbnailLoc: String
+	proxyLoc: String
+	fileStatus: String
+	editUser: String
+	videoCodec: String
+	audioCodec: String
+	fileFormat: String
+	fileLength: Float
+	frameRate: Float
+	frameCount: Int
+	numAudioTracks: Int
+	numVideoTracks: Int
+	fileSize: Int
+}
+
+input DeleteMAPSAssetsInput {
+	bucketObjKey: String!
+}
+
+type MAPSAssets @aws_api_key
+@aws_cognito_user_pools {
+	bucketObjKey: String! 
+@aws_api_key
+@aws_cognito_user_pools
+	prefixLoc: String
+		@aws_api_key
+@aws_cognito_user_pools
+	assetId: String
+		@aws_api_key
+@aws_cognito_user_pools
+	creationDate: AWSDateTime
+		@aws_api_key
+@aws_cognito_user_pools
+	lastModifiedDate: AWSDateTime
+		@aws_api_key
+@aws_cognito_user_pools
+	thumbnailLoc: String
+		@aws_api_key
+@aws_cognito_user_pools
+	proxyLoc: String
+		@aws_api_key
+@aws_cognito_user_pools
+	fileStatus: String
+		@aws_api_key
+@aws_cognito_user_pools
+	editUser: String
+		@aws_api_key
+@aws_cognito_user_pools
+	videoCodec: String
+		@aws_api_key
+@aws_cognito_user_pools
+	audioCodec: String
+		@aws_api_key
+@aws_cognito_user_pools
+	fileFormat: String
+		@aws_api_key
+@aws_cognito_user_pools
+	fileLength: Float
+		@aws_api_key
+@aws_cognito_user_pools
+	frameRate: Float
+		@aws_api_key
+@aws_cognito_user_pools
+	frameCount: Int
+		@aws_api_key
+@aws_cognito_user_pools
+	numAudioTracks: Int
+		@aws_api_key
+@aws_cognito_user_pools
+	numVideoTracks: Int
+		@aws_api_key
+@aws_cognito_user_pools
+	fileSize: Int
+		@aws_api_key
+@aws_cognito_user_pools
+}
+
+type MAPSAssetsConnection {
+	items: [MAPSAssets]
+	nextToken: String
+}
+
+type Mutation @aws_api_key
+@aws_cognito_user_pools {
+	createMAPSAssets(input: CreateMAPSAssetsInput!): MAPSAssets
+		@aws_api_key
+@aws_cognito_user_pools
+	updateMAPSAssets(input: UpdateMAPSAssetsInput!): MAPSAssets
+		@aws_api_key
+@aws_cognito_user_pools
+	deleteMAPSAssets(input: DeleteMAPSAssetsInput!): MAPSAssets
+		@aws_api_key
+@aws_cognito_user_pools
+}
+
+type Query @aws_api_key
+@aws_cognito_user_pools {
+	getMAPSAssets(bucketObjKey: String!): MAPSAssets
+		@aws_api_key
+@aws_cognito_user_pools
+	listMAPSAssets(filter: TableMAPSAssetsFilterInput, limit: Int, nextToken: String): MAPSAssetsConnection
+		@aws_api_key
+@aws_cognito_user_pools
+}
+
+type Subscription @aws_api_key
+@aws_cognito_user_pools {
+	onCreateMAPSAssets(
+		bucketObjKey: String,
+		assetId: String,
+		creationDate: AWSDateTime,
+		lastModifiedDate: AWSDateTime,
+		thumbnailLoc: String
+	): MAPSAssets
+		@aws_subscribe(mutations: ["createMAPSAssets"])
+    @aws_api_key
+    @aws_cognito_user_pools
+	onUpdateMAPSAssets(
+		bucketObjKey: String,
+		assetId: String,
+		creationDate: AWSDateTime,
+		lastModifiedDate: AWSDateTime,
+		thumbnailLoc: String
+	): MAPSAssets
+		@aws_subscribe(mutations: ["updateMAPSAssets"])
+    @aws_api_key
+    @aws_cognito_user_pools
+	onDeleteMAPSAssets(
+		bucketObjKey: String,
+		assetId: String,
+		creationDate: AWSDateTime,
+		lastModifiedDate: AWSDateTime,
+		thumbnailLoc: String
+	): MAPSAssets
+		@aws_subscribe(mutations: ["deleteMAPSAssets"])
+    @aws_api_key
+    @aws_cognito_user_pools
+}
+
+input TableBooleanFilterInput {
+	ne: Boolean
+	eq: Boolean
+}
+
+input TableFloatFilterInput {
+	ne: Float
+	eq: Float
+	le: Float
+	lt: Float
+	ge: Float
+	gt: Float
+	contains: Float
+	notContains: Float
+	between: [Float]
+}
+
+input TableIDFilterInput {
+	ne: ID
+	eq: ID
+	le: ID
+	lt: ID
+	ge: ID
+	gt: ID
+	contains: ID
+	notContains: ID
+	between: [ID]
+	beginsWith: ID
+}
+
+input TableIntFilterInput {
+	ne: Int
+	eq: Int
+	le: Int
+	lt: Int
+	ge: Int
+	gt: Int
+	contains: Int
+	notContains: Int
+	between: [Int]
+}
+
+input TableMAPSAssetsFilterInput {
+	bucketObjKey: TableStringFilterInput
+	prefixLoc: TableStringFilterInput
+	assetId: TableStringFilterInput
+	creationDate: TableStringFilterInput
+	lastModifiedDate: TableStringFilterInput
+	thumbnailLoc: TableStringFilterInput
+	proxyLoc: TableStringFilterInput
+	fileStatus: TableStringFilterInput
+	editUser: TableStringFilterInput
+	videoCodec: TableStringFilterInput
+	audioCodec: TableStringFilterInput
+	fileFormat: TableStringFilterInput
+	fileLength: TableFloatFilterInput
+	frameRate: TableFloatFilterInput
+	frameCount: TableIntFilterInput
+	numAudioTracks: TableIntFilterInput
+	numVideoTracks: TableIntFilterInput
+	fileSize: TableIntFilterInput
+}
+
+input TableStringFilterInput {
+	ne: String
+	eq: String
+	le: String
+	lt: String
+	ge: String
+	gt: String
+	contains: String
+	notContains: String
+	between: [String]
+	beginsWith: String
+}
+
+input UpdateMAPSAssetsInput {
+	bucketObjKey: String!
+	prefixLoc: String
+	assetId: String
+	creationDate: AWSDateTime
+	lastModifiedDate: AWSDateTime
+	thumbnailLoc: String
+	proxyLoc: String
+	fileStatus: String
+	editUser: String
+	videoCodec: String
+	audioCodec: String
+	fileFormat: String
+	fileLength: Float
+	frameRate: Float
+	frameCount: Int
+	numAudioTracks: Int
+	numVideoTracks: Int
+	fileSize: Int
+}

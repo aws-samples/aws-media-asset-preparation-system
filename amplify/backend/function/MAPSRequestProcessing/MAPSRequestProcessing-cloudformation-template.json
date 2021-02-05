@@ -1,0 +1,312 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+    "tablesMAPSTablesMAPSFolderPermissionsTable": {
+      "Type": "String"
+    },
+    "tablesMAPSTablesMAPSAssetDetailsTable": {
+      "Type": "String"
+    },
+    "authmapsauthcontrolsUserPoolId": {
+      "Type": "String",
+      "Default": "authmapsauthcontrolsUserPoolId"
+    },
+    "resMAPSSSMOutputBucketName": {
+      "Type": "String"
+    },
+    "resMAPSMediaBucketName": {
+      "Type": "String"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Metadata": {
+        "aws:asset:path": "./src",
+        "aws:asset:property": "Code"
+      },
+      "Properties": {
+        "Handler": "app.app",
+        "FunctionName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "MAPSApiProcessing",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "MAPSApiProcessing",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "Environment": {
+          "Variables": {
+            "ENV": {
+              "Ref": "env"
+            },
+            "REGION": {
+              "Ref": "AWS::Region"
+            },
+            "COGNITO_USER_POOL": {
+              "Ref": "authmapsauthcontrolsUserPoolId"
+            },
+            "ACTIVE_DB_TABLE": {
+              "Ref": "tablesMAPSTablesMAPSAssetDetailsTable"
+            },
+            "PERMISSIONS_DB_TABLE": {
+              "Ref": "tablesMAPSTablesMAPSFolderPermissionsTable"
+            },
+            "FSX_MOUNT": "\\\\<input FSX mount here\\share",
+            "SSM_OUTPUT_BUCKET": {
+              "Ref": "resMAPSSSMOutputBucketName"
+            },
+            "SSM_OUTPUT_PREFIX": "MAPS"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.8",
+        "Layers": [],
+        "Timeout": "300",
+        "Code": {
+          "S3Bucket": "amplify-maps-prod-111926-deployment",
+          "S3Key": "amplify-builds/MAPSRequestProcessing-3275626c777263485658-build.zip"
+        }
+      }
+    },
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "mapsLambdaRole72492c30",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "mapsLambdaRole72492c30",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "lambdaexecutionpolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
+                  {
+                    "region": {
+                      "Ref": "AWS::Region"
+                    },
+                    "account": {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "lambda": {
+                      "Ref": "LambdaFunction"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:UpdateItem"
+              ],
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${permtable}",
+                    {
+                      "permtable": {
+                        "Ref": "tablesMAPSTablesMAPSFolderPermissionsTable"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${permtable}/index/*",
+                    {
+                      "permtable": {
+                        "Ref": "tablesMAPSTablesMAPSFolderPermissionsTable"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:GetItem"
+              ],
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${trackingtable}",
+                    {
+                      "trackingtable": {
+                        "Ref": "tablesMAPSTablesMAPSAssetDetailsTable"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ssm:SendCommand",
+                "cognito-idp:ListGroups",
+                "cognito-idp:AdminListGroupsForUser"
+              ],
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/${instance}",
+                    {
+                      "instance": "*"
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:document/${doc}",
+                    {
+                      "doc": "AWS-RunPowerShellScript"
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:managed-instance/${instance}",
+                    {
+                      "instance": "*"
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${userpool}",
+                    {
+                      "userpool": {
+                        "Ref": "authmapsauthcontrolsUserPoolId"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:GetObjectAcl",
+                "s3:GetObject",
+                "ec2:DescribeAddresses",
+                "s3:ListAllMyBuckets",
+                "s3:GetBucketCORS"
+              ],
+              "Resource": "*"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "Name": {
+      "Value": {
+        "Ref": "LambdaFunction"
+      }
+    },
+    "Arn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaFunction",
+          "Arn"
+        ]
+      }
+    },
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    },
+    "LambdaExecutionRole": {
+      "Value": {
+        "Ref": "LambdaExecutionRole"
+      }
+    }
+  }
+}

@@ -1,0 +1,524 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "An auto-generated nested stack.",
+	"Metadata": {},
+	"Parameters": {
+		"AppSyncApiId": {
+			"Type": "String",
+			"Description": "The id of the AppSync API associated with this project."
+		},
+		"AppSyncApiName": {
+			"Type": "String",
+			"Description": "The name of the AppSync API",
+			"Default": "AppSyncSimpleTransform"
+		},
+		"env": {
+			"Type": "String",
+			"Description": "The environment name. e.g. Dev, Test, or Production",
+			"Default": "NONE"
+		},
+		"S3DeploymentBucket": {
+			"Type": "String",
+			"Description": "The S3 bucket containing all deployment assets for the project."
+		},
+		"S3DeploymentRootKey": {
+			"Type": "String",
+			"Description": "An S3 key relative to the S3DeploymentBucket that points to the root\nof the deployment directory."
+        },
+        "tablesMAPSTablesMAPSAssetDetailsTable": {
+            "Type": "String"
+        },
+        "functionMAPSLambdaResolverArn": {
+            "Type": "String"
+        }
+	},
+	"Resources": {
+		"MAPSAssetDetailsTableDataSource": {
+            "Type": "AWS::AppSync::DataSource",
+            "Properties": {
+                "ApiId":{
+                    "Ref":"AppSyncApiId"
+                },
+                "Name":"MAPSAssetDetailsTable",
+                "Type":"AMAZON_DYNAMODB",
+                "DynamoDBConfig": {
+                    "AwsRegion": {
+                        "Ref": "AWS::Region"
+                    },
+                    "TableName": {
+                        "Ref": "tablesMAPSTablesMAPSAssetDetailsTable"
+                    }
+                },
+                "ServiceRoleArn":{
+                    "Fn::GetAtt":[
+                       "MAPSDynamoDBResolverServiceRole",
+                       "Arn"
+                    ]
+                }
+            }
+        },
+
+        "MAPSDynamoDBResolverServiceRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Sub":[
+                        "MAPSDynamoDBResolverServiceRole-${env}",
+                        {
+                           "env":{
+                              "Ref":"env"
+                           }
+                        }
+                    ]
+                },
+                "AssumeRolePolicyDocument":{
+                    "Version":"2012-10-17",
+                    "Statement":[
+                       {
+                          "Effect":"Allow",
+                          "Principal":{
+                             "Service":"appsync.amazonaws.com"
+                          },
+                          "Action":"sts:AssumeRole"
+                       }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "MAPSDynamoResolverPolicy",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "dynamodb:DeleteItem",
+                                        "dynamodb:GetItem",
+                                        "dynamodb:PutItem",
+                                        "dynamodb:Query",
+                                        "dynamodb:Scan",
+                                        "dynamodb:UpdateItem"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Sub": [
+                                                "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}",
+                                                {
+                                                    "tablename":{
+                                                       "Ref": "tablesMAPSTablesMAPSAssetDetailsTable"
+                                                    }
+                                                 }
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Sub": [
+                                                "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*",
+                                                {
+                                                    "tablename":{
+                                                       "Ref": "tablesMAPSTablesMAPSAssetDetailsTable"
+                                                    }
+                                                 }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+
+        "MAPSLambdaResolverDataSource": {
+            "Type": "AWS::AppSync::DataSource",
+            "Properties": {
+                "ApiId": {
+                    "Ref":"AppSyncApiId"
+                },
+                "Name": "MAPSUserGroupLookUp",
+                "Type": "AWS_LAMBDA",
+                "ServiceRoleArn": {
+                    "Fn::GetAtt":[
+                        "MAPSLambdaResolverDataSourceRole",
+                        "Arn"
+                    ]
+                },
+                "LambdaConfig": {
+                    "LambdaFunctionArn": {
+                       "Ref": "functionMAPSLambdaResolverArn"
+                    }
+                }
+            }
+        },
+
+        "MAPSLambdaResolverDataSourceRole":{
+            "Type":"AWS::IAM::Role",
+            "Properties":{
+               "RoleName":{
+                  "Fn::Sub":[
+                     "MAPSLambdaResolverDataSourceRole-${env}",
+                     {
+                        "env":{
+                           "Ref":"env"
+                        }
+                     }
+                  ]
+               },
+               "AssumeRolePolicyDocument":{
+                  "Version":"2012-10-17",
+                  "Statement":[
+                     {
+                        "Effect":"Allow",
+                        "Principal":{
+                           "Service":"appsync.amazonaws.com"
+                        },
+                        "Action":"sts:AssumeRole"
+                     }
+                  ]
+               },
+               "Policies":[
+                  {
+                     "PolicyName":"InvokeLambdaFunction",
+                     "PolicyDocument":{
+                        "Version":"2012-10-17",
+                        "Statement":[
+                           {
+                              "Effect":"Allow",
+                              "Action":[
+                                 "lambda:invokeFunction"
+                              ],
+                              "Resource":[
+                                 {
+                                    "Ref": "functionMAPSLambdaResolverArn"
+                                 }
+                              ]
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+        },
+
+        "CreateMAPSAssetResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref":"AppSyncApiId"
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt":[
+                        "MAPSAssetDetailsTableDataSource",
+                        "Name"
+                    ]
+                },
+                "TypeName": "Mutation",
+                "FieldName": "createMAPSAssets",
+                "RequestMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.createMAPSAssets.req.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                 },
+                 "ResponseMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.createMAPSAssets.res.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                }
+            }
+        },
+
+        "UpdateMAPSAssetResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref":"AppSyncApiId"
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt":[
+                        "MAPSAssetDetailsTableDataSource",
+                        "Name"
+                    ]
+                },
+                "TypeName": "Mutation",
+                "FieldName": "updateMAPSAssets",
+                "RequestMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.updateMAPSAssets.req.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                 },
+                 "ResponseMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.updateMAPSAssets.res.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                }
+            }
+        },
+
+        "DeleteMAPSAssetResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref":"AppSyncApiId"
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt":[
+                        "MAPSAssetDetailsTableDataSource",
+                        "Name"
+                    ]
+                },
+                "TypeName": "Mutation",
+                "FieldName": "deleteMAPSAssets",
+                "RequestMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.deleteMAPSAssets.req.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                 },
+                 "ResponseMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Mutation.deleteMAPSAssets.res.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                }
+            }
+        },
+
+        "GetMAPSAssetResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref":"AppSyncApiId"
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt":[
+                        "MAPSAssetDetailsTableDataSource",
+                        "Name"
+                    ]
+                },
+                "TypeName": "Query",
+                "FieldName": "getMAPSAssets",
+                "RequestMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.getMAPSAssets.req.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                 },
+                 "ResponseMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.getMAPSAssets.res.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                }
+            }
+        },
+
+        "MAPSUserGroupLookupFunctionConfig": {
+            "Type": "AWS::AppSync::FunctionConfiguration",
+            "Properties": {
+                "ApiId": {
+                    "Ref":"AppSyncApiId"
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt":[
+                        "MAPSLambdaResolverDataSource",
+                        "Name"
+                    ]
+                },
+                "FunctionVersion": "2018-05-29",
+                "Name": "MAPSUserGroupLookup",
+                "RequestMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.userGroupLookup.req.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                },
+                 "ResponseMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.userGroupLookup.res.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                }
+            }
+        },
+
+        "MAPSQueryListAssetsFunctionConfig": {
+            "Type": "AWS::AppSync::FunctionConfiguration",
+            "Properties": {
+                "ApiId": {
+                    "Ref":"AppSyncApiId"
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt":[
+                        "MAPSAssetDetailsTableDataSource",
+                        "Name"
+                    ]
+                },
+                "FunctionVersion": "2018-05-29",
+                "Name": "MAPSListAssets",
+                "RequestMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.listMAPSAssets.req.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                },
+                 "ResponseMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.listMAPSAssets.res.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                }
+            }
+        },
+
+        "ListMAPSAssetResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Ref":"AppSyncApiId"
+                },
+                "TypeName": "Query",
+                "FieldName": "listMAPSAssets",
+                "Kind": "PIPELINE",
+                "PipelineConfig": {
+                    "Functions":[
+                        {
+                            "Fn::GetAtt" : [ "MAPSUserGroupLookupFunctionConfig", "FunctionId" ]
+                        },
+                        {
+                            "Fn::GetAtt" : [ "MAPSQueryListAssetsFunctionConfig", "FunctionId" ]
+                        }
+                    ]
+                },
+                "RequestMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.pipelineMAPSAssets.req.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                },
+                 "ResponseMappingTemplateS3Location":{
+                    "Fn::Sub":[
+                       "s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.pipelineMAPSAssets.res.vtl",
+                       {
+                          "S3DeploymentBucket":{
+                             "Ref":"S3DeploymentBucket"
+                          },
+                          "S3DeploymentRootKey":{
+                             "Ref":"S3DeploymentRootKey"
+                          }
+                       }
+                    ]
+                }
+            }
+        }
+
+	},
+	"Conditions": {
+		"HasEnvironmentParameter": {
+			"Fn::Not": [
+				{
+					"Fn::Equals": [
+						{
+							"Ref": "env"
+						},
+						"NONE"
+					]
+				}
+			]
+		}
+    }
+}

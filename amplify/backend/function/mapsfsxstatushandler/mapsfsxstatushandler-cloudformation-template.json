@@ -1,0 +1,290 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+    "apiMAPSMediaAssetAPIGraphQLAPIEndpointOutput": {
+      "Type": "String"
+    },
+    "apiMAPSMediaAssetAPIGraphQLAPIIdOutput": {
+      "Type": "String"
+    },
+    "resMAPSSSMOutputBucketName": {
+      "Type": "String"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Metadata": {
+        "aws:asset:path": "./src",
+        "aws:asset:property": "Code"
+      },
+      "Properties": {
+        "Handler": "lambda_function.lambda_handler",
+        "FunctionName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "MAPSFsxStatusHandler",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "MAPSFsxStatusHandler",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "Environment": {
+          "Variables": {
+            "ENV": {
+              "Ref": "env"
+            },
+            "REGION": {
+              "Ref": "AWS::Region"
+            },
+            "GQL_API_ID": {
+              "Ref": "apiMAPSMediaAssetAPIGraphQLAPIIdOutput"
+            },
+            "GQL_URL": {
+              "Ref": "apiMAPSMediaAssetAPIGraphQLAPIEndpointOutput"
+            },
+            "SSM_OUTPUT_BUCKET": {
+              "Ref": "resMAPSSSMOutputBucketName"
+            },
+            "SSM_OUTPUT_PREFIX": "MAPS"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.8",
+        "Layers": [],
+        "Timeout": "900",
+        "Code": {
+          "S3Bucket": "amplify-maps-prod-111926-deployment",
+          "S3Key": "amplify-builds/mapsfsxstatushandler-674837326b37555a3038-build.zip"
+        }
+      }
+    },
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "mapsLambdaRolea367a093",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "mapsLambdaRolea367a093",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "lambdaexecutionpolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
+                  {
+                    "region": {
+                      "Ref": "AWS::Region"
+                    },
+                    "account": {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "lambda": {
+                      "Ref": "LambdaFunction"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": "s3:GetObject",
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:aws:s3:::${ssmbucket}/*",
+                  {
+                    "ssmbucket": {
+                      "Ref": "resMAPSSSMOutputBucketName"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "appsync:ListApiKeys"
+              ],
+              "Resource": "*"
+            }
+          ]
+        }
+      }
+    },
+    "SysManagerRunCommandEBRule": {
+      "Type": "AWS::Events::Rule",
+      "DependsOn": [
+        "LambdaFunction"
+      ],
+      "Properties": {
+        "Description": "EventBridge Rule to trigger Lambda upon Systems Manager Run Command state change.",
+        "EventPattern": {
+          "source": [
+            "aws.ssm"
+          ],
+          "detail-type": [
+            "EC2 Command Status-change Notification"
+          ]
+        },
+        "Name": {
+          "Fn::Sub": [
+            "MAPS-SysManager-StatusChange-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        },
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "LambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": {
+              "Fn::Sub": [
+                "MAPS-SysManager-StatusChange-Rule-${env}",
+                {
+                  "env": {
+                    "Ref": "env"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "EventBridgeNotificationPermissions": {
+      "Type": "AWS::Lambda::Permission",
+      "DependsOn": [
+        "LambdaFunction",
+        "SysManagerRunCommandEBRule"
+      ],
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "SysManagerRunCommandEBRule",
+            "Arn"
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "Name": {
+      "Value": {
+        "Ref": "LambdaFunction"
+      }
+    },
+    "Arn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaFunction",
+          "Arn"
+        ]
+      }
+    },
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    },
+    "LambdaExecutionRole": {
+      "Value": {
+        "Ref": "LambdaExecutionRole"
+      }
+    }
+  }
+}

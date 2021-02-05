@@ -1,0 +1,12 @@
+{
+  "mutableParametersState": {
+    "permissions": {
+      "auth": {
+        "mapsauthcontrols": [
+          "read"
+        ]
+      }
+    }
+  },
+  "lambdaLayers": []
+}

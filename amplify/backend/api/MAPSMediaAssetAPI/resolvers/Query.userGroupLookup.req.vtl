@@ -1,0 +1,8 @@
+#**
+The value of 'payload' after the template has been evaluated
+will be passed as the event to AWS Lambda.
+*#
+{
+  "operation": "Invoke",
+  "payload": $util.toJson($context)
+}

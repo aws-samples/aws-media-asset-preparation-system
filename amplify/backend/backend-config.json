@@ -1,0 +1,290 @@
+{
+  "tables": {
+    "MAPSTables": {
+      "service": "DyanmoDB",
+      "providerPlugin": "awscloudformation"
+    }
+  },
+  "res": {
+    "MAPS": {
+      "service": "S3sqsEventBridge",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "mapsdeletefolderhandler",
+          "attributes": [
+            "Arn"
+          ]
+        }
+      ]
+    }
+  },
+  "function": {
+    "mapsauthcontrolsPostConfirmation": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "MAPSLambdaResolver": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "tables",
+          "resourceName": "MAPSTables",
+          "attributes": [
+            "MAPSFolderPermissionsTable",
+            "MAPSAssetDetailsTable"
+          ]
+        }
+      ]
+    },
+    "MAPSRequestProcessing": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "auth",
+          "resourceName": "mapsauthcontrols",
+          "attributes": [
+            "UserPoolId"
+          ]
+        },
+        {
+          "category": "tables",
+          "resourceName": "MAPSTables",
+          "attributes": [
+            "MAPSFolderPermissionsTable",
+            "MAPSAssetDetailsTable"
+          ]
+        },
+        {
+          "category": "res",
+          "resourceName": "MAPS",
+          "attributes": [
+            "SSMOutputBucketName",
+            "MediaBucketName"
+          ]
+        }
+      ]
+    },
+    "mapsdeletefolderhandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "tables",
+          "resourceName": "MAPSTables",
+          "attributes": [
+            "MAPSFolderPermissionsTable"
+          ]
+        }
+      ]
+    },
+    "mapsfsxstatushandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "api",
+          "resourceName": "MAPSMediaAssetAPI",
+          "attributes": [
+            "GraphQLAPIEndpointOutput",
+            "GraphQLAPIIdOutput"
+          ]
+        },
+        {
+          "category": "res",
+          "resourceName": "MAPS",
+          "attributes": [
+            "SSMOutputBucketName"
+          ]
+        }
+      ]
+    },
+    "MAPSMediaInfoLambdaLayer": {
+      "runtimes": [
+        "python3.7"
+      ],
+      "layerVersionMap": {
+        "1": {
+          "permissions": [
+            {
+              "type": "private"
+            }
+          ]
+        }
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer",
+      "build": true
+    },
+    "mapspopulatemetadata": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "api",
+          "resourceName": "MAPSMediaAssetAPI",
+          "attributes": [
+            "GraphQLAPIEndpointOutput",
+            "GraphQLAPIIdOutput"
+          ]
+        },
+        {
+          "category": "tables",
+          "resourceName": "MAPSTables",
+          "attributes": [
+            "MAPSAssetDetailsTable"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "MAPSMediaInfoLambdaLayer",
+          "attributes": [
+            "Arn"
+          ]
+        }
+      ]
+    },
+    "mapsmediaconvertstartjob": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "api",
+          "resourceName": "MAPSMediaAssetAPI",
+          "attributes": [
+            "GraphQLAPIEndpointOutput",
+            "GraphQLAPIIdOutput"
+          ]
+        },
+        {
+          "category": "res",
+          "resourceName": "MAPS",
+          "attributes": [
+            "MAPSQueueArn",
+            "MediaMetadataBucketName"
+          ]
+        },
+        {
+          "category": "auth",
+          "resourceName": "mapsauthcontrols",
+          "attributes": [
+            "UserPoolId"
+          ]
+        },
+        {
+          "category": "tables",
+          "resourceName": "MAPSTables",
+          "attributes": [
+            "MAPSFolderPermissionsTable",
+            "MAPSAssetDetailsTable"
+          ]
+        }
+      ]
+    }
+  },
+  "auth": {
+    "userPoolGroups": {
+      "service": "Cognito-UserPool-Groups",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "auth",
+          "resourceName": "mapsauthcontrols",
+          "attributes": [
+            "UserPoolId",
+            "AppClientIDWeb",
+            "AppClientID",
+            "IdentityPoolId"
+          ]
+        }
+      ]
+    },
+    "mapsauthcontrols": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "mapsauthcontrolsPostConfirmation",
+          "triggerProvider": "Cognito",
+          "attributes": [
+            "Arn",
+            "Name"
+          ]
+        }
+      ]
+    }
+  },
+  "api": {
+    "MAPSMediaAssetAPI": {
+      "service": "AppSync",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "tables",
+          "resourceName": "MAPSTables",
+          "attributes": [
+            "MAPSAssetDetailsTable"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "MAPSLambdaResolver",
+          "attributes": [
+            "Arn"
+          ]
+        }
+      ],
+      "output": {
+        "authConfig": {
+          "additionalAuthenticationProviders": [
+            {
+              "authenticationType": "API_KEY",
+              "apiKeyConfig": {
+                "description": "For use within Lambda functions",
+                "apiKeyExpirationDays": 365
+              }
+            }
+          ],
+          "defaultAuthentication": {
+            "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+            "userPoolConfig": {
+              "userPoolId": "authmapsauthcontrols"
+            }
+          }
+        }
+      }
+    },
+    "MAPSFrontEndAPI": {
+      "service": "API Gateway",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "MAPSRequestProcessing",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "auth",
+          "resourceName": "mapsauthcontrols",
+          "attributes": [
+            "UserPoolId"
+          ]
+        }
+      ]
+    }
+  }
+}

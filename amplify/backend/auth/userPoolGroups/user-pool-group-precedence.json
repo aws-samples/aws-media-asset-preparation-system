@@ -1,0 +1,48 @@
+[
+    {
+        "groupName": "admin",
+        "precedence": 1,
+        "customPolicies": [{
+            "PolicyName": "admin-group-policy",
+              "PolicyDocument": {
+              "Version":"2012-10-17",
+              "Statement":[
+                  {
+                    "Sid":"statement1",
+                    "Effect":"Allow",
+                    "Action":[
+                        "s3:DeleteObject",
+                        "s3:PutObject"
+                    ],
+                    "Resource":[
+                        "arn:aws:s3:::*"
+                    ]
+                  }
+               ]
+            }
+        }]
+    },
+    {
+        "groupName": "editors",
+        "precedence": 2,
+        "customPolicies": [{
+            "PolicyName": "admin-group-policy",
+              "PolicyDocument": {
+              "Version":"2012-10-17",
+              "Statement":[
+                  {
+                    "Sid":"statement1",
+                    "Effect":"Allow",
+                    "Action":[
+                        "s3:DeleteObject",
+                        "s3:PutObject"
+                    ],
+                    "Resource":[
+                        "arn:aws:s3:::*"
+                    ]
+                  }
+               ]
+            }
+        }]
+    }
+]
