@@ -58,10 +58,10 @@ To automatically deploy the app, click the big orange button 👇
 
 ## Contributors
 
-Matt Herson
-Brandon Lindauer
-Mario Monello
-Kim Wendt
+Matt Herson  
+Brandon Lindauer  
+Mario Monello  
+Kim Wendt  
 
 
 ## License
