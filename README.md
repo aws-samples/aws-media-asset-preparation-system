@@ -56,6 +56,14 @@ To automatically deploy the app, click the big orange button 👇
 3. Connect to the [AWS Amplify Console](https://console.aws.amazon.com/amplify/home) and wait for the build & deploy process to complete. You will be given a production URL and you are ready to start preparing media assets!
 
 
+## Contributors
+
+Matt Herson
+Brandon Lindauer
+Mario Monello
+Kim Wendt
+
+
 ## License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
