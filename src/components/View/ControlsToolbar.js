@@ -315,14 +315,4 @@ function ControlsToolbar(props) {
     );
 };
 
-/**
- * <Tooltip title="Upload">
-    <IconButton onClick={handleCheckinClick} style={{display: selectedMediaAssets.length === 1 ? 'inline' : 'none'}}>
-        <Avatar className={classes.avatarStyle}>
-            <PublishIcon style={{fill: 'white'}}/>
-        </Avatar>
-    </IconButton>
-</Tooltip>
- */
-
 export default ControlsToolbar;

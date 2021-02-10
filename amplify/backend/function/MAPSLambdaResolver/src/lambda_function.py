@@ -44,7 +44,10 @@ def validate_permissions(userGroups, bucket, folderKey):
                 return True
         return False
     except KeyError as e:
-        return False
+        if folderKey == '/':
+            return True
+        else:
+            return False
     
 def lambda_handler(event, context):
     groups = event['identity']['claims']['cognito:groups']

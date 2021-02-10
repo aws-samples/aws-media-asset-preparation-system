@@ -5,6 +5,15 @@ The Media Asset Preparation System (MAPS) facilitates the preparation and moveme
 ![](./images/MAPS.png)
 
 
+## Requirements
+Before you deploy, you must have the following in place:
+
+* [AWS Account](https://aws.amazon.com/account/)
+* Code repository (e.g. [GitHub](https://github.com/), [AWS CodeCommit](https://aws.amazon.com/codecommit/), [Bitbucket](https://bitbucket.org/product))
+* [Node 10 or greater](https://nodejs.org/en/download/)
+* [Amplify CLI 4.41.2 or greater installed and configured](https://aws-amplify.github.io/docs/cli-toolchain/quickstart#quickstart)
+* [Python version 3.6 or greater](https://www.python.org/downloads/)
+
 ## Deploy the App
 
 To automatically deploy the app, click the big orange button 👇
@@ -30,16 +39,15 @@ To automatically deploy the app, click the big orange button 👇
 ? Enter a name for the environment: dev (or whatever you would like to call this env)
 ? Choose your default editor: <YOUR_EDITOR_OF_CHOICE>
 ? Do you want to use an AWS profile? Y
+? Enter the name of the group to which users will be added. editors
+Adding Lambda layer MAPSMediaInfoLambdaLayer to dev environment.
+? Choose the environment to import the layer access settings from: (Use arrow keys)
+❯ Apply default access (Only this AWS account) 
 
 ~ amplify push
 ? Are you sure you want to continue? Y
 ? Do you want to generate code for your newly created GraphQL API? N
 > We already have the GraphQL code generated for this project, so generating it here is not necessary.
-```
-3. Start the app and register a new user
-
-```sh
-~ npm start
 ```
 
 ### Deploy the front end
@@ -50,10 +58,14 @@ To automatically deploy the app, click the big orange button 👇
 
 ```sh
 ~ git remote add origin <your_new_repository>
-~ git push --set-upstream mainline
+~ git push --set-upstream <branch_name>
 ```
 
-3. Connect to the [AWS Amplify Console](https://console.aws.amazon.com/amplify/home) and wait for the build & deploy process to complete. You will be given a production URL and you are ready to start preparing media assets!
+3. Connect to the [AWS Amplify Console](https://console.aws.amazon.com/amplify/home) and wait for the build & deploy process to complete. You will be given a production URL that you can use to interact with MAPS!
+
+### Getting Started
+
+Once MAPS is deployed, follow the [Getting Started](./docs/GettingStarted.md) guide to begin preparing media assets.
 
 
 ## Contributors

@@ -76,7 +76,7 @@
             "PERMISSIONS_DB_TABLE": {
               "Ref": "tablesMAPSTablesMAPSFolderPermissionsTable"
             },
-            "FSX_MOUNT": "\\\\<input FSX mount here\\share",
+            "FSX_MOUNT": "\\\\<input FSX mount here>\\share",
             "SSM_OUTPUT_BUCKET": {
               "Ref": "resMAPSSSMOutputBucketName"
             },
@@ -242,7 +242,7 @@
                 },
                 {
                   "Fn::Sub": [
-                    "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:document/${doc}",
+                    "arn:aws:ssm:${AWS::Region}::document/${doc}",
                     {
                       "doc": "AWS-RunPowerShellScript"
                     }
@@ -275,7 +275,8 @@
                 "s3:GetObject",
                 "ec2:DescribeAddresses",
                 "s3:ListAllMyBuckets",
-                "s3:GetBucketCORS"
+                "s3:GetBucketCORS",
+                "iam:PassRole"
               ],
               "Resource": "*"
             }

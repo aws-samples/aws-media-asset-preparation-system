@@ -154,9 +154,8 @@ function FilePicker(props) {
     const file = e.target.files[0];
     if (file !== null) {
       setNewFile(file);
-      const cleanFileName = file.name.replace(/[&\/\\#, +()$~%'":*?!<>{}]/g, '_'); 
-      setFileName(cleanFileName);
-      setFileLabel(cleanFileName);
+      setFileName(file.name);
+      setFileLabel(file.name);
     }
   };
 
@@ -165,12 +164,12 @@ function FilePicker(props) {
     .then((response) => {
         AWS.config.credentials = response;
         AWS.config.region = awsmobile['aws_cognito_region'];
-
         var upload = new AWS.S3.ManagedUpload({
             params: {
                 Bucket: bucketName,
                 Key: `${selectedPrefix}${fileName}`,
-                Body: newFile
+                Body: newFile,
+                ContentDisposition: `attachment; filename=\"${fileName}\"`
             }
         });
 

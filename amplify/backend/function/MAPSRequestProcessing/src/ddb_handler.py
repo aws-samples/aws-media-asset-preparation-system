@@ -23,6 +23,7 @@ import s3_handler
 from datetime import datetime, timezone
 from botocore.client import Config
 from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
+from urllib.parse import quote_plus
 
 s3_client = boto3.client('s3', config=Config(signature_version='s3v4'))
 ddb_client = boto3.client('dynamodb')
@@ -94,7 +95,7 @@ def handle_upload_file_req(request_body, request_cxt):
 def handle_download_file_req(request_body, request_cxt):
     bucketName = request_body['bucketName']
     key = request_body['key']
-    displayKey = key.split('/')[-1]
+    displayKey = quote_plus(key.split('/')[-1])
     readOnly = request_body['readOnly']
     user = request_cxt['authorizer']['claims']['cognito:username']
     
@@ -368,6 +369,8 @@ def update_folder_permissions(request_body, request_cxt):
     bucket_name = request_body['bucketName']
     folder_key = request_body['folderKey']
     newPermissionGroup = request_body['permissions']
+    if 'admin' not in newPermissionGroup:
+        newPermissionGroup.append('admin')
 
     groups = request_cxt['authorizer']['claims']['cognito:groups']
     if 'admin' in groups:

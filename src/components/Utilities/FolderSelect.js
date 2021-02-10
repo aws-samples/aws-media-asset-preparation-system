@@ -93,6 +93,7 @@ function FolderSelect(props) {
 
     const localMoveFileHandler = () => {
         moveFilesHandler(localPrefix);
+        localCloseHandler();
     };
 
     const localCloseHandler = () => {

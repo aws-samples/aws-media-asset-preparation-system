@@ -20,6 +20,7 @@ import boto3
 import json
 import uuid
 import http.client
+from urllib.parse import unquote_plus
 
 MEDIA_CONVERT_ROLE = os.environ['MEDIA_CONVERT_ROLE']
 OUTPUT_BUCKET = os.environ['OUTPUT_BUCKET']
@@ -138,7 +139,7 @@ def lambda_handler(event, context):
     for record in event['Records']:
         parsed_record = json.loads(record['body'])
         bucket = parsed_record['Records'][0]['s3']['bucket']['name']
-        key = parsed_record['Records'][0]['s3']['object']['key']
+        key = unquote_plus(parsed_record['Records'][0]['s3']['object']['key'])
         eventTime = parsed_record['Records'][0]['eventTime']
         fileSize = parsed_record['Records'][0]['s3']['object']['size']
         
