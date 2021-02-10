@@ -15,14 +15,6 @@ Before you deploy, you must have the following in place:
 * [Amplify CLI 4.41.2 or greater installed and configured](https://aws-amplify.github.io/docs/cli-toolchain/quickstart#quickstart)
 * [Python version 3.6 or greater](https://www.python.org/downloads/)
 
-## Deploy the App
-
-To automatically deploy the app, click the big orange button 👇
-
-[![amplifybutton](https://oneclick.amplifyapp.com/button.svg)](https://console.aws.amazon.com/amplify/home#/deploy?repo=https://github.com/aws-samples/aws-media-asset-preparation-system)
-
-> If you wish to manually deploy the app, follow the instructions below.
-
 ### Deploy the back end
 
 1. Clone the repo & install the dependencies
