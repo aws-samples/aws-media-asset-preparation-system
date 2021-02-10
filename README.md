@@ -10,6 +10,7 @@ Before you deploy, you must have the following in place:
 
 * [AWS Account](https://aws.amazon.com/account/)
 * Code repository (e.g. [GitHub](https://github.com/), [AWS CodeCommit](https://aws.amazon.com/codecommit/), [Bitbucket](https://bitbucket.org/product))
+> If you plan to modify the code base, you will also need the following
 * [Node 10 or greater](https://nodejs.org/en/download/)
 * [Amplify CLI 4.41.2 or greater installed and configured](https://aws-amplify.github.io/docs/cli-toolchain/quickstart#quickstart)
 * [Python version 3.6 or greater](https://www.python.org/downloads/)

@@ -30,8 +30,8 @@ By default, the MAPS deployment creates an empty S3 media bucket for use with th
 
 1. Navigate to the AWS Amplify console and retrieve the production URL for your Amplify deployment.
 2. Remotely connect to your EC2 edit instance via RDP or Teradici following the instructions in this [blog post](https://aws.amazon.com/blogs/media/getting-started-with-aws-cloud-video-editing/).
-3. Open a web browser (Chrome is preferred), and go to the Amplify URL from step 1.
-4. You should be prompted with a sign-in page. You should use the admin user you created in the previous section. *Note: you will be prompted to change your password, and may also be prompted to enter an email for account recovery purposes*
+3. Open a web browser on the instance (Chrome is preferred), and go to the Amplify URL from step 1.
+4. You will be prompted with a sign-in page. You should use the admin user you created in the previous section. *Note: you will be prompted to change your password, and may also be prompted to enter an email for account recovery purposes*
 5. Once logged in, you will see the MAPS interface (shown below).
 
 ![](../images/maps_main.png)
@@ -41,7 +41,7 @@ By default, the MAPS deployment creates an empty S3 media bucket for use with th
 
 ![](../images/maps_settings.png)
 
-8. The MAPS interface should now be configured, so let's add some folders and media assets.
+8. The MAPS interface is now be configured, so let's add some folders and media assets.
 
 ### Creating folders & uploading assets
 1. To add a folder, click the Add Folder button in the controls toolbar. Enter a name for the folder and click Create Folder. *Note: to navigate between folders, simply click on the table row.*
@@ -70,7 +70,7 @@ By default, the MAPS deployment creates an empty S3 media bucket for use with th
 
 ![](../images/copy_fsx.png)
 
-**Note: This operation must be performed from an EC2 instance configured as described above. It may take a few minutes to copy the files from S3 to FSx. 
+*Note: This operation must be performed from an EC2 instance configured as described above. It may take a few minutes to copy the files from S3 to FSx.* 
 
 6. When you no longer need the media assets in Amazon FSx, select the assets you wish to remove from Fsx.
 7. Right click on one of the rows and select Remove from FSx.
@@ -79,4 +79,4 @@ By default, the MAPS deployment creates an empty S3 media bucket for use with th
 By default, there are two permission groups when you deploy MAPS: admin and editors. When a user creates a folder, the folder and all assets within it inherit that user's group permissions. The admin group is automatically added to all new folders as well. Users in the admin group are the only ones who can update the permissions of a given folder. Adding more groups must be done in the Amazon Cognito console.
 
 1. Right click on the folder you wish to change permissions for and click on Permissions.
-2. Select or unselect the groups to give permission to and click Save. *Note: you won't be able to remove the admin group permissions*
+2. Select or unselect the groups to give permission to and click Save. *Note: you won't be able to fully remove the admin group permissions*
