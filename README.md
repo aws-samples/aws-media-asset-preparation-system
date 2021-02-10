@@ -22,7 +22,7 @@ To automatically deploy the app, click the big orange button 👇
 
 > If you wish to manually deploy the app, follow the instructions below.
 
-### Deploy the back end and run the app
+### Deploy the back end
 
 1. Clone the repo & install the dependencies
 ```sh
