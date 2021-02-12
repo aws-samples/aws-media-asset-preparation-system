@@ -25,7 +25,7 @@ from botocore.client import Config
 from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
 from urllib.parse import quote_plus
 
-s3_client = boto3.client('s3', config=Config(signature_version='s3v4'))
+s3_client = boto3.client('s3')
 ddb_client = boto3.client('dynamodb')
 ec2_client = boto3.client('ec2')
 ssm_client = boto3.client('ssm')

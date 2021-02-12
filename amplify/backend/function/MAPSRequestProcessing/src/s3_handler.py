@@ -25,8 +25,9 @@ from botocore.client import Config
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key, Attr
 from boto3.dynamodb.types import TypeDeserializer
+from urllib.parse import quote_plus
 
-s3_client = boto3.client('s3', config=Config(signature_version='s3v4'))
+s3_client = boto3.client('s3')
 ddb_client = boto3.client('dynamodb')
 cognito_client = boto3.client('cognito-idp')
 
@@ -135,10 +136,11 @@ def get_s3_ddb_data(bucket_name, next_token, keyPrefix, req_cxt):
     
 def get_s3_obj(bucket_name, key):
     obj_resp = {}
-    
+    displayKey = quote_plus(key.split('/')[-1])
     params={
         'Bucket': bucket_name,
-        'Key': key
+        'Key': key,
+        'ResponseContentDisposition': f'attachment; filename={displayKey};'
     }
     
     s3_resp = s3_client.generate_presigned_url('get_object', 
