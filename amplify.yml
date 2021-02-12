@@ -13,8 +13,6 @@ backend:
         - ln -fs /usr/local/bin/python3.8 /usr/bin/python3
         - ln -fs /usr/local/bin/pip3.8 /usr/bin/pip3
         - cd $BASE_PATH
-    build:
-      commands:
         - '# Execute Amplify CLI with the helper script'
         - amplifyPush --simple
 frontend:
