@@ -138,15 +138,14 @@ def appsync_update(bucket, key, ddb_item):
         'host': HOST
     }
     bucketObjKey = '{}/{}'.format(bucket, key)
-    prefixLoc = key.split('/', 1)[0]
+    prefixLoc = key.rsplit('/', 1)[0]
     if key.count('/') == 0:
         prefixLoc = '/'
     elif prefixLoc[-1] != '/':
         prefixLoc += '/'
-    print(prefixLoc)
 
     graphql_mutation = {
-        'query': 'mutation($in:UpdateMAPSAssetsInput!){updateMAPSAssets(input:$in){bucketObjKey videoCodec audioCodec fileFormat fileLength frameRate frameCount numAudioTracks numVideoTracks fileSize thumbnailLoc proxyLoc fileStatus editUser prefixLoc}}',
+        'query': 'mutation($in:UpdateMAPSAssetsInput!){updateMAPSAssets(input:$in){bucketObjKey videoCodec audioCodec fileFormat fileLength frameRate frameCount numAudioTracks numVideoTracks fileSize thumbnailLoc proxyLoc fileStatus editUser prefixLoc assetId lastModifiedDate creationDate}}',
         'variables': '{ "in": {"bucketObjKey":"'+bucketObjKey+'", "prefixLoc":"'+prefixLoc+'", "videoCodec":"'+ddb_item['videoCodec']+'", "audioCodec":"'+ddb_item['audioCodec']+'", "fileFormat":"'+ddb_item['fileFormat']+'", "fileLength":"'+ddb_item['fileLength']+'", "frameRate":"'+ddb_item['frameRate']+'", "frameCount":"'+ddb_item['frameCount']+'", "numAudioTracks":"'+ddb_item['numAudioTracks']+'", "numVideoTracks":"'+ddb_item['numVideoTracks']+'", "thumbnailLoc":"'+ddb_item['thumbnailLoc']+'", "proxyLoc":"'+ddb_item['proxyLoc']+'"} }'
     }
     mutation_data = json.dumps(graphql_mutation)

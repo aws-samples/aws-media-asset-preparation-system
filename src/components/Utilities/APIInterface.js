@@ -20,8 +20,8 @@ import AWS from 'aws-sdk';
 import { saveAs } from 'file-saver';
 import awsmobile from '../../aws-exports';
 
-import { deleteMAPSAssets, createMAPSAssets } from '../../graphql/mutations';
-import { getMAPSAssets } from '../../graphql/queries';
+import { deleteMapsAssets, createMapsAssets } from '../../graphql/mutations';
+import { getMapsAssets } from '../../graphql/queries';
 
 Amplify.configure(awsmobile);
 const apiName = "MAPSFrontEndAPI";
@@ -64,7 +64,7 @@ async function DeleteObjectRequest(bucketName, key, alertHandler) {
                         bucketObjKey: `${bucketName}/${key}`
                     }
                 };
-                API.graphql(graphqlOperation(deleteMAPSAssets, deleteObj));
+                API.graphql(graphqlOperation(deleteMapsAssets, deleteObj));
             })
             .catch((err) => {
                 console.log(err);
@@ -173,14 +173,14 @@ async function RenameMoveObjRequest(bucketName, keys, newPrefix, alertHandler) {
                         } 
                     };
 
-                    API.graphql(graphqlOperation(getMAPSAssets, oldObject['input']))
+                    API.graphql(graphqlOperation(getMapsAssets, oldObject['input']))
                     .then((getObjRes) => {
                         let createObj = getObjRes.data.getMAPSAssets;
                         createObj['bucketObjKey'] = `${bucketName}/${obj['newKey']}`;
                         createObj['prefixLoc'] = newPrefix === '' ? '/' : newPrefix;
 
-                        API.graphql(graphqlOperation(createMAPSAssets, { input: createObj }));
-                        API.graphql(graphqlOperation(deleteMAPSAssets, oldObject));
+                        API.graphql(graphqlOperation(createMapsAssets, { input: createObj }));
+                        API.graphql(graphqlOperation(deleteMapsAssets, oldObject));
                     })
                     .catch((getObjErr) => {
                         console.log("Something bad happened in object get", getObjErr);

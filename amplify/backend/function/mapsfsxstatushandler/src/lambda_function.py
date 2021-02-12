@@ -70,7 +70,7 @@ def update_status(bucket, key, fileStatus):
     bucketObjKey = '{}/{}'.format(bucket, key)
 
     graphql_mutation = {
-        'query': 'mutation($in:UpdateMAPSAssetsInput!){updateMAPSAssets(input:$in){bucketObjKey fileStatus}}',
+        'query': 'mutation($in:UpdateMAPSAssetsInput!){updateMAPSAssets(input:$in){bucketObjKey videoCodec audioCodec fileFormat fileLength frameRate frameCount numAudioTracks numVideoTracks fileSize thumbnailLoc proxyLoc fileStatus editUser prefixLoc assetId lastModifiedDate creationDate}}',
         'variables': '{ "in": {"bucketObjKey":"'+bucketObjKey+'", "fileStatus":"'+fileStatus+'"} }'
     }
     mutation_data = json.dumps(graphql_mutation)

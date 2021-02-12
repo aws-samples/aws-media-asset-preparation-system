@@ -1,21 +1,9 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const onCreateMAPSAssets = /* GraphQL */ `
-  subscription OnCreateMAPSAssets(
-    $bucketObjKey: String
-    $assetId: String
-    $creationDate: AWSDateTime
-    $lastModifiedDate: AWSDateTime
-    $thumbnailLoc: String
-  ) {
-    onCreateMAPSAssets(
-      bucketObjKey: $bucketObjKey
-      assetId: $assetId
-      creationDate: $creationDate
-      lastModifiedDate: $lastModifiedDate
-      thumbnailLoc: $thumbnailLoc
-    ) {
+export const onCreateMapsAssets = /* GraphQL */ `
+  subscription OnCreateMapsAssets {
+    onCreateMAPSAssets {
       bucketObjKey
       prefixLoc
       assetId
@@ -37,21 +25,9 @@ export const onCreateMAPSAssets = /* GraphQL */ `
     }
   }
 `;
-export const onUpdateMAPSAssets = /* GraphQL */ `
-  subscription OnUpdateMAPSAssets(
-    $bucketObjKey: String
-    $assetId: String
-    $creationDate: AWSDateTime
-    $lastModifiedDate: AWSDateTime
-    $thumbnailLoc: String
-  ) {
-    onUpdateMAPSAssets(
-      bucketObjKey: $bucketObjKey
-      assetId: $assetId
-      creationDate: $creationDate
-      lastModifiedDate: $lastModifiedDate
-      thumbnailLoc: $thumbnailLoc
-    ) {
+export const onUpdateMapsAssets = /* GraphQL */ `
+  subscription OnUpdateMapsAssets {
+    onUpdateMAPSAssets {
       bucketObjKey
       prefixLoc
       assetId
@@ -73,21 +49,9 @@ export const onUpdateMAPSAssets = /* GraphQL */ `
     }
   }
 `;
-export const onDeleteMAPSAssets = /* GraphQL */ `
-  subscription OnDeleteMAPSAssets(
-    $bucketObjKey: String
-    $assetId: String
-    $creationDate: AWSDateTime
-    $lastModifiedDate: AWSDateTime
-    $thumbnailLoc: String
-  ) {
-    onDeleteMAPSAssets(
-      bucketObjKey: $bucketObjKey
-      assetId: $assetId
-      creationDate: $creationDate
-      lastModifiedDate: $lastModifiedDate
-      thumbnailLoc: $thumbnailLoc
-    ) {
+export const onDeleteMapsAssets = /* GraphQL */ `
+  subscription OnDeleteMapsAssets {
+    onDeleteMAPSAssets {
       bucketObjKey
       prefixLoc
       assetId

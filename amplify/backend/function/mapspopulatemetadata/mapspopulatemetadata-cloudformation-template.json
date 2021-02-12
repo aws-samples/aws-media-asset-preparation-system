@@ -1,334 +1,344 @@
 {
-  "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Lambda Function resource stack creation using Amplify CLI",
-  "Parameters": {
-    "env": {
-      "Type": "String"
-    },
-    "apiMAPSMediaAssetAPIGraphQLAPIEndpointOutput": {
-      "Type": "String"
-    },
-    "apiMAPSMediaAssetAPIGraphQLAPIIdOutput": {
-      "Type": "String"
-    },
-    "tablesMAPSTablesMAPSAssetDetailsTable": {
-      "Type": "String"
-    },
-    "functionMAPSMediaInfoLambdaLayerArn": {
-      "Type": "String"
-    }
-  },
-  "Conditions": {
-    "ShouldNotCreateEnvResources": {
-      "Fn::Equals": [
-        {
-          "Ref": "env"
-        },
-        "NONE"
-      ]
-    }
-  },
-  "Resources": {
-    "LambdaFunction": {
-      "Type": "AWS::Lambda::Function",
-      "Metadata": {
-        "aws:asset:path": "./src",
-        "aws:asset:property": "Code"
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Lambda Function resource stack creation using Amplify CLI",
+    "Parameters": {
+      "env": {
+        "Type": "String"
       },
-      "Properties": {
-        "Handler": "lambda_function.lambda_handler",
-        "FunctionName": {
-          "Fn::If": [
-            "ShouldNotCreateEnvResources",
-            "MAPSPopulateMetadata",
-            {
-              "Fn::Join": [
-                "",
-                [
-                  "MAPSPopulateMetadata",
-                  "-",
-                  {
-                    "Ref": "env"
-                  }
-                ]
-              ]
-            }
-          ]
-        },
-        "Environment": {
-          "Variables": {
-            "ENV": {
-              "Ref": "env"
-            },
-            "REGION": {
-              "Ref": "AWS::Region"
-            },
-            "GQL_API_ID": {
-              "Ref": "apiMAPSMediaAssetAPIGraphQLAPIIdOutput"
-            },
-            "GQL_URL": {
-              "Ref": "apiMAPSMediaAssetAPIGraphQLAPIEndpointOutput"
-            },
-            "LD_LIBRARY_PATH": "/opt/python",
-            "TRACKING_DB_TABLE": {
-              "Ref": "tablesMAPSTablesMAPSAssetDetailsTable"
-            }
-          }
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "LambdaExecutionRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "python3.7",
-        "Layers": [
-          {
-            "Ref": "functionMAPSMediaInfoLambdaLayerArn"
-          }
-        ],
-        "Timeout": "300",
-        "Code": {
-          "S3Bucket": "amplify-maps-prod-111926-deployment",
-          "S3Key": "amplify-builds/mapspopulatemetadata-757a726366376b76696f-build.zip"
-        }
+      "apiMAPSMediaAssetAPIGraphQLAPIEndpointOutput": {
+        "Type": "String"
+      },
+      "apiMAPSMediaAssetAPIGraphQLAPIIdOutput": {
+        "Type": "String"
+      },
+      "tablesMAPSTablesMAPSAssetDetailsTable": {
+        "Type": "String"
+      },
+      "functionMAPSMediaInfoLambdaLayerArn": {
+        "Type": "String"
+      },
+      "deploymentBucketName": {
+        "Type": "String"
+      },
+      "s3Key": {
+        "Type": "String"
       }
     },
-    "LambdaExecutionRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "RoleName": {
-          "Fn::If": [
-            "ShouldNotCreateEnvResources",
-            "mapsLambdaRole399c7a38",
-            {
-              "Fn::Join": [
-                "",
-                [
-                  "mapsLambdaRole399c7a38",
-                  "-",
-                  {
-                    "Ref": "env"
-                  }
-                ]
-              ]
-            }
-          ]
-        },
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              },
-              "Action": [
-                "sts:AssumeRole"
-              ]
-            }
-          ]
-        }
-      }
-    },
-    "lambdaexecutionpolicy": {
-      "DependsOn": [
-        "LambdaExecutionRole"
-      ],
-      "Type": "AWS::IAM::Policy",
-      "Properties": {
-        "PolicyName": "lambda-execution-policy",
-        "Roles": [
+    "Conditions": {
+      "ShouldNotCreateEnvResources": {
+        "Fn::Equals": [
           {
-            "Ref": "LambdaExecutionRole"
-          }
-        ],
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "logs:CreateLogGroup",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents"
-              ],
-              "Resource": {
-                "Fn::Sub": [
-                  "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
-                  {
-                    "region": {
-                      "Ref": "AWS::Region"
-                    },
-                    "account": {
-                      "Ref": "AWS::AccountId"
-                    },
-                    "lambda": {
-                      "Ref": "LambdaFunction"
-                    }
-                  }
-                ]
-              }
-            },
-            {
-              "Effect": "Allow",
-              "Action": [
-                "dynamodb:GetItem",
-                "dynamodb:UpdateItem"
-              ],
-              "Resource": {
-                "Fn::Sub": [
-                  "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${trackingtable}",
-                  {
-                    "trackingtable": {
-                      "Ref": "tablesMAPSTablesMAPSAssetDetailsTable"
-                    }
-                  }
-                ]
-              }
-            },
-            {
-              "Effect": "Allow",
-              "Action": [
-                "s3:GetObject"
-              ],
-              "Resource": "*"
-            },
-            {
-              "Effect": "Allow",
-              "Action": [
-                "mediaconvert:DescribeEndpoints",
-                "mediaconvert:GetJob"
-              ],
-              "Resource": [
-                {
-                  "Fn::Sub": [
-                    "arn:aws:mediaconvert:${AWS::Region}:${AWS::AccountId}:endpoints/*",
-                    {}
-                  ]
-                },
-                {
-                  "Fn::Sub": [
-                    "arn:aws:mediaconvert:${AWS::Region}:${AWS::AccountId}:jobs/*",
-                    {}
-                  ]
-                }
-              ]
-            },
-            {
-              "Effect": "Allow",
-              "Action": [
-                "appsync:ListApiKeys"
-              ],
-              "Resource": "*"
-            }
-          ]
-        }
-      }
-    },
-    "MediaConvertEBRule": {
-      "Type": "AWS::Events::Rule",
-      "DependsOn": [
-        "LambdaFunction"
-      ],
-      "Properties": {
-        "Description": "EventBridge Rule to trigger Lambda upon MediaConvert job status change.",
-        "EventPattern": {
-          "source": [
-            "aws.mediaconvert"
-          ],
-          "detail-type": [
-            "MediaConvert Job State Change"
-          ],
-          "detail": {
-            "status": [
-              "COMPLETE",
-              "ERROR"
-            ]
-          }
-        },
-        "Name": {
-          "Fn::Sub": [
-            "MAPS-MediaConvert-StatusChange-${env}",
-            {
-              "env": {
-                "Ref": "env"
-              }
-            }
-          ]
-        },
-        "State": "ENABLED",
-        "Targets": [
-          {
-            "Arn": {
-              "Fn::GetAtt": [
-                "LambdaFunction",
-                "Arn"
-              ]
-            },
-            "Id": {
-              "Fn::Sub": [
-                "MAPS-MediaConvert-StatusChange-${env}",
-                {
-                  "env": {
-                    "Ref": "env"
-                  }
-                }
-              ]
-            }
-          }
+            "Ref": "env"
+          },
+          "NONE"
         ]
       }
     },
-    "EventBridgeNotificationPermissions": {
-      "Type": "AWS::Lambda::Permission",
-      "DependsOn": [
-        "LambdaFunction",
-        "MediaConvertEBRule"
-      ],
-      "Properties": {
-        "FunctionName": {
+    "Resources": {
+      "LambdaFunction": {
+        "Type": "AWS::Lambda::Function",
+        "Metadata": {
+          "aws:asset:path": "./src",
+          "aws:asset:property": "Code"
+        },
+        "Properties": {
+          "Handler": "lambda_function.lambda_handler",
+          "FunctionName": {
+            "Fn::If": [
+              "ShouldNotCreateEnvResources",
+              "MAPSPopulateMetadata",
+              {
+                "Fn::Join": [
+                  "",
+                  [
+                    "MAPSPopulateMetadata",
+                    "-",
+                    {
+                      "Ref": "env"
+                    }
+                  ]
+                ]
+              }
+            ]
+          },
+          "Environment": {
+            "Variables": {
+              "ENV": {
+                "Ref": "env"
+              },
+              "REGION": {
+                "Ref": "AWS::Region"
+              },
+              "GQL_API_ID": {
+                "Ref": "apiMAPSMediaAssetAPIGraphQLAPIIdOutput"
+              },
+              "GQL_URL": {
+                "Ref": "apiMAPSMediaAssetAPIGraphQLAPIEndpointOutput"
+              },
+              "LD_LIBRARY_PATH": "/opt/python",
+              "TRACKING_DB_TABLE": {
+                "Ref": "tablesMAPSTablesMAPSAssetDetailsTable"
+              }
+            }
+          },
+          "Role": {
+            "Fn::GetAtt": [
+              "LambdaExecutionRole",
+              "Arn"
+            ]
+          },
+          "Runtime": "python3.7",
+          "Layers": [
+            {
+              "Ref": "functionMAPSMediaInfoLambdaLayerArn"
+            }
+          ],
+          "Timeout": "300",
+          "Code": {
+            "S3Bucket": {
+              "Ref": "deploymentBucketName"
+            },
+            "S3Key": {
+              "Ref": "s3Key"
+            }
+          }
+        }
+      },
+      "LambdaExecutionRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "RoleName": {
+            "Fn::If": [
+              "ShouldNotCreateEnvResources",
+              "mapsLambdaRole399c7a38",
+              {
+                "Fn::Join": [
+                  "",
+                  [
+                    "mapsLambdaRole399c7a38",
+                    "-",
+                    {
+                      "Ref": "env"
+                    }
+                  ]
+                ]
+              }
+            ]
+          },
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": [
+                    "lambda.amazonaws.com"
+                  ]
+                },
+                "Action": [
+                  "sts:AssumeRole"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "lambdaexecutionpolicy": {
+        "DependsOn": [
+          "LambdaExecutionRole"
+        ],
+        "Type": "AWS::IAM::Policy",
+        "Properties": {
+          "PolicyName": "lambda-execution-policy",
+          "Roles": [
+            {
+              "Ref": "LambdaExecutionRole"
+            }
+          ],
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "logs:CreateLogGroup",
+                  "logs:CreateLogStream",
+                  "logs:PutLogEvents"
+                ],
+                "Resource": {
+                  "Fn::Sub": [
+                    "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
+                    {
+                      "region": {
+                        "Ref": "AWS::Region"
+                      },
+                      "account": {
+                        "Ref": "AWS::AccountId"
+                      },
+                      "lambda": {
+                        "Ref": "LambdaFunction"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "dynamodb:GetItem",
+                  "dynamodb:UpdateItem"
+                ],
+                "Resource": {
+                  "Fn::Sub": [
+                    "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${trackingtable}",
+                    {
+                      "trackingtable": {
+                        "Ref": "tablesMAPSTablesMAPSAssetDetailsTable"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "s3:GetObject"
+                ],
+                "Resource": "*"
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "mediaconvert:DescribeEndpoints",
+                  "mediaconvert:GetJob"
+                ],
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws:mediaconvert:${AWS::Region}:${AWS::AccountId}:endpoints/*",
+                      {}
+                    ]
+                  },
+                  {
+                    "Fn::Sub": [
+                      "arn:aws:mediaconvert:${AWS::Region}:${AWS::AccountId}:jobs/*",
+                      {}
+                    ]
+                  }
+                ]
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "appsync:ListApiKeys"
+                ],
+                "Resource": "*"
+              }
+            ]
+          }
+        }
+      },
+      "MediaConvertEBRule": {
+        "Type": "AWS::Events::Rule",
+        "DependsOn": [
+          "LambdaFunction"
+        ],
+        "Properties": {
+          "Description": "EventBridge Rule to trigger Lambda upon MediaConvert job status change.",
+          "EventPattern": {
+            "source": [
+              "aws.mediaconvert"
+            ],
+            "detail-type": [
+              "MediaConvert Job State Change"
+            ],
+            "detail": {
+              "status": [
+                "COMPLETE",
+                "ERROR"
+              ]
+            }
+          },
+          "Name": {
+            "Fn::Sub": [
+              "MAPS-MediaConvert-StatusChange-${env}",
+              {
+                "env": {
+                  "Ref": "env"
+                }
+              }
+            ]
+          },
+          "State": "ENABLED",
+          "Targets": [
+            {
+              "Arn": {
+                "Fn::GetAtt": [
+                  "LambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Id": {
+                "Fn::Sub": [
+                  "MAPS-MediaConvert-StatusChange-${env}",
+                  {
+                    "env": {
+                      "Ref": "env"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "EventBridgeNotificationPermissions": {
+        "Type": "AWS::Lambda::Permission",
+        "DependsOn": [
+          "LambdaFunction",
+          "MediaConvertEBRule"
+        ],
+        "Properties": {
+          "FunctionName": {
+            "Fn::GetAtt": [
+              "LambdaFunction",
+              "Arn"
+            ]
+          },
+          "Action": "lambda:InvokeFunction",
+          "Principal": "events.amazonaws.com",
+          "SourceArn": {
+            "Fn::GetAtt": [
+              "MediaConvertEBRule",
+              "Arn"
+            ]
+          }
+        }
+      }
+    },
+    "Outputs": {
+      "Name": {
+        "Value": {
+          "Ref": "LambdaFunction"
+        }
+      },
+      "Arn": {
+        "Value": {
           "Fn::GetAtt": [
             "LambdaFunction",
             "Arn"
           ]
-        },
-        "Action": "lambda:InvokeFunction",
-        "Principal": "events.amazonaws.com",
-        "SourceArn": {
-          "Fn::GetAtt": [
-            "MediaConvertEBRule",
-            "Arn"
-          ]
+        }
+      },
+      "Region": {
+        "Value": {
+          "Ref": "AWS::Region"
+        }
+      },
+      "LambdaExecutionRole": {
+        "Value": {
+          "Ref": "LambdaExecutionRole"
         }
       }
     }
-  },
-  "Outputs": {
-    "Name": {
-      "Value": {
-        "Ref": "LambdaFunction"
-      }
-    },
-    "Arn": {
-      "Value": {
-        "Fn::GetAtt": [
-          "LambdaFunction",
-          "Arn"
-        ]
-      }
-    },
-    "Region": {
-      "Value": {
-        "Ref": "AWS::Region"
-      }
-    },
-    "LambdaExecutionRole": {
-      "Value": {
-        "Ref": "LambdaExecutionRole"
-      }
-    }
   }
-}

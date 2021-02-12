@@ -25,8 +25,8 @@ import CardAssetView from '../Cards/CardAssetView';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import Dialog from '@material-ui/core/Dialog';
 
-import { listMAPSAssets } from '../../graphql/queries';
-import { onCreateMAPSAssets, onUpdateMAPSAssets, onDeleteMAPSAssets } from '../../graphql/subscriptions';
+import { listMapsAssets } from '../../graphql/queries';
+import { onCreateMapsAssets, onUpdateMapsAssets, onDeleteMapsAssets } from '../../graphql/subscriptions';
 import { getBucketKey } from '../Utilities/FormatUtil';
 import { GetBucketFolders, GetUserGroups } from '../Utilities/APIInterface';
 import { stableSort, getComparator } from '../Utilities/TableSortUtil';
@@ -257,8 +257,7 @@ export default function MainAssetViewer(props) {
                 }
             };
 
-            const assets = await API.graphql(graphqlOperation(listMAPSAssets, {filter: filter}));
-
+            const assets = await API.graphql(graphqlOperation(listMapsAssets, {filter: filter}));
             let { nextToken } = assets.data.listMAPSAssets;
             if (nextToken === undefined) {
                 nextToken = '';
@@ -337,9 +336,10 @@ export default function MainAssetViewer(props) {
 
     function listenForUpdatedAssets(){
         return API.graphql(
-            graphqlOperation(onUpdateMAPSAssets),
+            graphqlOperation(onUpdateMapsAssets),
         ).subscribe({
             next: (((data) => {
+                console.log(data);
                 const updateAssetData = data.value.data.onUpdateMAPSAssets;
                 dispatch({type: 'UPDATE', data: updateAssetData});
             })),
@@ -348,9 +348,10 @@ export default function MainAssetViewer(props) {
 
     function listenForNewAssets() {
         return API.graphql(
-            graphqlOperation(onCreateMAPSAssets),
+            graphqlOperation(onCreateMapsAssets),
         ).subscribe({
             next: (((data) => {
+                console.log(data);
                 const newAssetData = data.value.data.onCreateMAPSAssets;
                 dispatch({type: 'NEW', data: newAssetData});
             })),
@@ -359,9 +360,10 @@ export default function MainAssetViewer(props) {
 
     function listenForDeletedAssets() {
         return API.graphql(
-            graphqlOperation(onDeleteMAPSAssets),
+            graphqlOperation(onDeleteMapsAssets),
         ).subscribe({
             next: (((data) => {
+                console.log(data);
                 const deleteAssetData = data.value.data.onDeleteMAPSAssets;
                 dispatch({type: 'DELETE', data: deleteAssetData});
             }))

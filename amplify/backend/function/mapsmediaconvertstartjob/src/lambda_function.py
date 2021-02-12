@@ -92,7 +92,7 @@ def appsync_update(bucket, key, eventTime, fileSize, api_key):
     }
 
     graphql_mutation = {
-        'query': 'mutation($in:UpdateMAPSAssetsInput!){updateMAPSAssets(input:$in){bucketObjKey lastModifiedDate fileStatus fileSize}}',
+        'query': 'mutation($in:UpdateMAPSAssetsInput!){updateMAPSAssets(input:$in){bucketObjKey videoCodec audioCodec fileFormat fileLength frameRate frameCount numAudioTracks numVideoTracks fileSize thumbnailLoc proxyLoc fileStatus editUser prefixLoc assetId lastModifiedDate creationDate}}',
         'variables': '{ "in": {"bucketObjKey":"'+bucketObjKey+'", "lastModifiedDate":"'+eventTime+'", "fileStatus":"'+'S3'+'", "fileSize":"'+str(fileSize)+'"} }'
     }
     mutation_data = json.dumps(graphql_mutation)
@@ -106,12 +106,11 @@ def appsync_update(bucket, key, eventTime, fileSize, api_key):
 
 def appsync_create(bucket, key, assetId, eventTime, fileSize, api_key):
     bucketObjKey = "{}/{}".format(bucket, key)
-    prefixLoc = key.split('/', 1)[0]
+    prefixLoc = key.rsplit('/', 1)[0]
     if key.count('/') == 0:
         prefixLoc = '/'
     elif prefixLoc[-1] != '/':
         prefixLoc += '/'
-    print(prefixLoc)
 
     HOST = GQL_URL.replace('https://','').replace('/graphql','')
     conn = http.client.HTTPSConnection(HOST, 443)

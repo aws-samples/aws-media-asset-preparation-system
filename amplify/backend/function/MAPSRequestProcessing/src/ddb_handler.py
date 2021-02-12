@@ -75,7 +75,7 @@ def handle_upload_file_req(request_body, request_cxt):
             else:
                 obj_response_body = {"allowCheckIn": False, "reason": 'File already downloaded by another user'}
         else:
-            obj_response_body = {"allowCheckIn": False, "overwrite": True, "reason": 'File is already being tracked, do you wish to overwrite it?'}
+            obj_response_body = {"allowCheckIn": False, "overwrite": True, "reason": 'File already exists.'}
     
     else:
         # Extra sanity check incase upload was not logged into DDB table

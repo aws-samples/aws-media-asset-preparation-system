@@ -25,60 +25,24 @@ input DeleteMAPSAssetsInput {
 
 type MAPSAssets @aws_api_key
 @aws_cognito_user_pools {
-	bucketObjKey: String! 
-@aws_api_key
-@aws_cognito_user_pools
+	bucketObjKey: String!
 	prefixLoc: String
-		@aws_api_key
-@aws_cognito_user_pools
 	assetId: String
-		@aws_api_key
-@aws_cognito_user_pools
 	creationDate: AWSDateTime
-		@aws_api_key
-@aws_cognito_user_pools
 	lastModifiedDate: AWSDateTime
-		@aws_api_key
-@aws_cognito_user_pools
 	thumbnailLoc: String
-		@aws_api_key
-@aws_cognito_user_pools
 	proxyLoc: String
-		@aws_api_key
-@aws_cognito_user_pools
 	fileStatus: String
-		@aws_api_key
-@aws_cognito_user_pools
 	editUser: String
-		@aws_api_key
-@aws_cognito_user_pools
 	videoCodec: String
-		@aws_api_key
-@aws_cognito_user_pools
 	audioCodec: String
-		@aws_api_key
-@aws_cognito_user_pools
 	fileFormat: String
-		@aws_api_key
-@aws_cognito_user_pools
 	fileLength: Float
-		@aws_api_key
-@aws_cognito_user_pools
 	frameRate: Float
-		@aws_api_key
-@aws_cognito_user_pools
 	frameCount: Int
-		@aws_api_key
-@aws_cognito_user_pools
 	numAudioTracks: Int
-		@aws_api_key
-@aws_cognito_user_pools
 	numVideoTracks: Int
-		@aws_api_key
-@aws_cognito_user_pools
 	fileSize: Int
-		@aws_api_key
-@aws_cognito_user_pools
 }
 
 type MAPSAssetsConnection {
@@ -86,61 +50,135 @@ type MAPSAssetsConnection {
 	nextToken: String
 }
 
+enum ModelAttributeTypes {
+	binary
+	binarySet
+	bool
+	list
+	map
+	number
+	numberSet
+	string
+	stringSet
+	_null
+}
+
+input ModelBooleanInput {
+	ne: Boolean
+	eq: Boolean
+	attributeExists: Boolean
+	attributeType: ModelAttributeTypes
+}
+
+input ModelFloatInput {
+	ne: Float
+	eq: Float
+	le: Float
+	lt: Float
+	ge: Float
+	gt: Float
+	between: [Float]
+	attributeExists: Boolean
+	attributeType: ModelAttributeTypes
+}
+
+input ModelIDInput {
+	ne: ID
+	eq: ID
+	le: ID
+	lt: ID
+	ge: ID
+	gt: ID
+	contains: ID
+	notContains: ID
+	between: [ID]
+	beginsWith: ID
+	attributeExists: Boolean
+	attributeType: ModelAttributeTypes
+	size: ModelSizeInput
+}
+
+input ModelIntInput {
+	ne: Int
+	eq: Int
+	le: Int
+	lt: Int
+	ge: Int
+	gt: Int
+	between: [Int]
+	attributeExists: Boolean
+	attributeType: ModelAttributeTypes
+}
+
+input ModelMAPSAssetsConditionInput {
+	prefixLoc: ModelStringInput
+	assetId: ModelStringInput
+	creationDate: ModelStringInput
+	lastModifiedDate: ModelStringInput
+	thumbnailLoc: ModelStringInput
+	proxyLoc: ModelStringInput
+	fileStatus: ModelStringInput
+	editUser: ModelStringInput
+	videoCodec: ModelStringInput
+	audioCodec: ModelStringInput
+	fileFormat: ModelStringInput
+	fileLength: ModelFloatInput
+	frameRate: ModelFloatInput
+	frameCount: ModelIntInput
+	numAudioTracks: ModelIntInput
+	numVideoTracks: ModelIntInput
+	fileSize: ModelIntInput
+	and: [ModelMAPSAssetsConditionInput]
+	or: [ModelMAPSAssetsConditionInput]
+	not: ModelMAPSAssetsConditionInput
+}
+
+input ModelSizeInput {
+	ne: Int
+	eq: Int
+	le: Int
+	lt: Int
+	ge: Int
+	gt: Int
+	between: [Int]
+}
+
+input ModelStringInput {
+	ne: String
+	eq: String
+	le: String
+	lt: String
+	ge: String
+	gt: String
+	contains: String
+	notContains: String
+	between: [String]
+	beginsWith: String
+	attributeExists: Boolean
+	attributeType: ModelAttributeTypes
+	size: ModelSizeInput
+}
+
 type Mutation @aws_api_key
 @aws_cognito_user_pools {
-	createMAPSAssets(input: CreateMAPSAssetsInput!): MAPSAssets
-		@aws_api_key
-@aws_cognito_user_pools
-	updateMAPSAssets(input: UpdateMAPSAssetsInput!): MAPSAssets
-		@aws_api_key
-@aws_cognito_user_pools
-	deleteMAPSAssets(input: DeleteMAPSAssetsInput!): MAPSAssets
-		@aws_api_key
-@aws_cognito_user_pools
+	createMAPSAssets(input: CreateMAPSAssetsInput!, condition: ModelMAPSAssetsConditionInput): MAPSAssets
+	updateMAPSAssets(input: UpdateMAPSAssetsInput!, condition: ModelMAPSAssetsConditionInput): MAPSAssets
+	deleteMAPSAssets(input: DeleteMAPSAssetsInput!, condition: ModelMAPSAssetsConditionInput): MAPSAssets
 }
 
 type Query @aws_api_key
 @aws_cognito_user_pools {
-	getMAPSAssets(bucketObjKey: String!): MAPSAssets
-		@aws_api_key
-@aws_cognito_user_pools
 	listMAPSAssets(filter: TableMAPSAssetsFilterInput, limit: Int, nextToken: String): MAPSAssetsConnection
-		@aws_api_key
-@aws_cognito_user_pools
+	getMAPSAssets(bucketObjKey: String!): MAPSAssets
 }
 
-type Subscription @aws_api_key
-@aws_cognito_user_pools {
-	onCreateMAPSAssets(
-		bucketObjKey: String,
-		assetId: String,
-		creationDate: AWSDateTime,
-		lastModifiedDate: AWSDateTime,
-		thumbnailLoc: String
-	): MAPSAssets
+type Subscription {
+	onCreateMAPSAssets: MAPSAssets
 		@aws_subscribe(mutations: ["createMAPSAssets"])
-    @aws_api_key
-    @aws_cognito_user_pools
-	onUpdateMAPSAssets(
-		bucketObjKey: String,
-		assetId: String,
-		creationDate: AWSDateTime,
-		lastModifiedDate: AWSDateTime,
-		thumbnailLoc: String
-	): MAPSAssets
+	onUpdateMAPSAssets: MAPSAssets
 		@aws_subscribe(mutations: ["updateMAPSAssets"])
-    @aws_api_key
-    @aws_cognito_user_pools
-	onDeleteMAPSAssets(
-		bucketObjKey: String,
-		assetId: String,
-		creationDate: AWSDateTime,
-		lastModifiedDate: AWSDateTime,
-		thumbnailLoc: String
-	): MAPSAssets
+	onDeleteMAPSAssets: MAPSAssets
 		@aws_subscribe(mutations: ["deleteMAPSAssets"])
-    @aws_api_key
-    @aws_cognito_user_pools
 }
 
 input TableBooleanFilterInput {

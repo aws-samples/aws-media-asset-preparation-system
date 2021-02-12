@@ -1,32 +1,8 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const getMAPSAssets = /* GraphQL */ `
-  query GetMAPSAssets($bucketObjKey: String!) {
-    getMAPSAssets(bucketObjKey: $bucketObjKey) {
-      bucketObjKey
-      prefixLoc
-      assetId
-      creationDate
-      lastModifiedDate
-      thumbnailLoc
-      proxyLoc
-      fileStatus
-      editUser
-      videoCodec
-      audioCodec
-      fileFormat
-      fileLength
-      frameRate
-      frameCount
-      numAudioTracks
-      numVideoTracks
-      fileSize
-    }
-  }
-`;
-export const listMAPSAssets = /* GraphQL */ `
-  query ListMAPSAssets(
+export const listMapsAssets = /* GraphQL */ `
+  query ListMapsAssets(
     $filter: TableMAPSAssetsFilterInput
     $limit: Int
     $nextToken: String
@@ -53,6 +29,30 @@ export const listMAPSAssets = /* GraphQL */ `
         fileSize
       }
       nextToken
+    }
+  }
+`;
+export const getMapsAssets = /* GraphQL */ `
+  query GetMapsAssets($bucketObjKey: String!) {
+    getMAPSAssets(bucketObjKey: $bucketObjKey) {
+      bucketObjKey
+      prefixLoc
+      assetId
+      creationDate
+      lastModifiedDate
+      thumbnailLoc
+      proxyLoc
+      fileStatus
+      editUser
+      videoCodec
+      audioCodec
+      fileFormat
+      fileLength
+      frameRate
+      frameCount
+      numAudioTracks
+      numVideoTracks
+      fileSize
     }
   }
 `;
