@@ -21,15 +21,7 @@ To automatically deploy the app, click the big orange button 👇
 
 [![amplifybutton](https://oneclick.amplifyapp.com/button.svg)](https://console.aws.amazon.com/amplify/home#/deploy?repo=https://github.com/aws-samples/aws-media-asset-preparation-system)
 
-Configure the back end deployment settings to match the image below. *Note: if you don't have an Amplify Service role, you will need to create one.*
-
-![](./images/backend_config.png)
-
-Also, be sure to change the default Amplify CLI version from latest to 4.43.0 in the **Advanced Settings** portion of the Amplify config.
-
-![](./images/advanced_settings.png)
-
-Click **Next** and then **Save and Deploy**. It will take ~20 minutes to deploy the entire application.
+*Note: if you don't have an Amplify Service role, you will need to create one.*
 
 > If you wish to manually deploy the app, follow the instructions below.
 ### Deploy the back end
