@@ -107,7 +107,6 @@ def extract_tech_metadata(bucket, key):
             duration = track['duration'] if 'duration' in track else 0
             frame_rate = track['frame_rate'] if 'frame_rate' in track else 0
             frame_count = track['frame_count'] if 'frame_count' in track else 0
-            file_size = track['file_size'] if 'file_size' in track else 0
             break
     
     ddb_item['videoCodec'] = video_codec
@@ -118,7 +117,6 @@ def extract_tech_metadata(bucket, key):
     ddb_item['frameCount'] = str(frame_count)
     ddb_item['numAudioTracks'] = str(num_audio_tracks)
     ddb_item['numVideoTracks'] = str(num_video_tracks)
-    ddb_item['fileSize'] = str(file_size)
     
     return ddb_item
 

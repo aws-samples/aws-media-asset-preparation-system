@@ -140,7 +140,7 @@ def lambda_handler(event, context):
         bucket = parsed_record['Records'][0]['s3']['bucket']['name']
         key = unquote_plus(parsed_record['Records'][0]['s3']['object']['key'])
         eventTime = parsed_record['Records'][0]['eventTime']
-        fileSize = parsed_record['Records'][0]['s3']['object']['size']
+        fileSize = float(parsed_record['Records'][0]['s3']['object']['size'])
         
         # Restrict calls on folders
         if key[-1] != '/':
