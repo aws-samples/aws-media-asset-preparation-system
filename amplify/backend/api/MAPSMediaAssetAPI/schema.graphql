@@ -16,7 +16,7 @@ input CreateMAPSAssetsInput {
 	frameCount: Int
 	numAudioTracks: Int
 	numVideoTracks: Int
-	fileSize: Int
+	fileSize: Float
 }
 
 input DeleteMAPSAssetsInput {
@@ -42,7 +42,7 @@ type MAPSAssets @aws_api_key
 	frameCount: Int
 	numAudioTracks: Int
 	numVideoTracks: Int
-	fileSize: Int
+	fileSize: Float
 }
 
 type MAPSAssetsConnection {
@@ -127,7 +127,7 @@ input ModelMAPSAssetsConditionInput {
 	frameCount: ModelIntInput
 	numAudioTracks: ModelIntInput
 	numVideoTracks: ModelIntInput
-	fileSize: ModelIntInput
+	fileSize: ModelFloatInput
 	and: [ModelMAPSAssetsConditionInput]
 	or: [ModelMAPSAssetsConditionInput]
 	not: ModelMAPSAssetsConditionInput
@@ -241,7 +241,7 @@ input TableMAPSAssetsFilterInput {
 	frameCount: TableIntFilterInput
 	numAudioTracks: TableIntFilterInput
 	numVideoTracks: TableIntFilterInput
-	fileSize: TableIntFilterInput
+	fileSize: TableFloatFilterInput
 }
 
 input TableStringFilterInput {
@@ -275,5 +275,5 @@ input UpdateMAPSAssetsInput {
 	frameCount: Int
 	numAudioTracks: Int
 	numVideoTracks: Int
-	fileSize: Int
+	fileSize: Float
 }
