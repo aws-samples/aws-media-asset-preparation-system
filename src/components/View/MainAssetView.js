@@ -42,10 +42,8 @@ export default function MainAssetViewer(props) {
         show: false
     });
     const [selectedMediaAssets, setSelected] = useState([]);
-    const [nextToken, setNextToken] = useState(
-        localStorage.getItem('MapsMediaAssetNextToken') || ''
-    );
     const [mediaAssets, setMediaAssets] = useState([]);
+    const [nextToken, setNextToken] = useState(undefined);
     const [filteredAssets, setFilteredAssets] = useState([]);
 
     const [bucketFolders, setBucketFolders] = useState([]);
@@ -67,6 +65,7 @@ export default function MainAssetViewer(props) {
     const [username, setUsername] = useState('');
     const [userGroups, setUserGroups] = useState([]);
     const [allGroups, setAllGroups] = useState([]);
+    const paginationLimit = 500;
 
     useEffect(() => {
         localStorage.setItem('MapsSelectedPrefix', selectedPrefix);
@@ -75,10 +74,6 @@ export default function MainAssetViewer(props) {
     useEffect(() => {
         localStorage.setItem('viewLayout', viewLayout);
     }, [viewLayout]);
-
-    useEffect(() => {
-        localStorage.setItem('MapsMediaAssetNextToken', nextToken);
-    }, [nextToken]);
 
     // HANDLERS //
     const handlePrefixChange = (event, folderKey) => {
@@ -257,15 +252,13 @@ export default function MainAssetViewer(props) {
                 }
             };
 
-            const assets = await API.graphql(graphqlOperation(listMapsAssets, {filter: filter}));
-            let { nextToken } = assets.data.listMAPSAssets;
-            if (nextToken === undefined) {
-                nextToken = '';
-            }
-
+            let assets = await API.graphql(graphqlOperation(listMapsAssets, {filter: filter, limit: paginationLimit}));
+            let nextNewToken = assets.data.listMAPSAssets.nextToken;
             setMediaAssets(assets.data.listMAPSAssets.items);
             applyFilters(assets.data.listMAPSAssets.items, undefined, undefined, undefined);
-            setNextToken(nextToken);
+            if (nextNewToken !== null) {
+                setNextToken(nextNewToken);
+            }
         };
 
         // Only pull assets if a bucket has been selected
@@ -274,6 +267,31 @@ export default function MainAssetViewer(props) {
             listMediaAssets();
         }
     }, [bucketName, selectedPrefix]);
+
+    useEffect(() => {
+        async function paginateAssets() {
+            if (bucketName !== '') {
+                const tempPrefix = selectedPrefix === '' ? '/' : selectedPrefix;
+                const filter = {
+                    'prefixLoc': {
+                        eq: tempPrefix
+                    },
+                    'bucketObjKey': {
+                        contains: bucketName
+                    }
+                };
+
+                let assets = await API.graphql(graphqlOperation(listMapsAssets, {filter: filter, limit: paginationLimit, nextToken: nextToken}));
+                let nextNewToken = assets.data.listMAPSAssets.nextToken;
+                setMediaAssets(mediaAssets.concat(assets.data.listMAPSAssets.items));
+                applyFilters(mediaAssets.concat(assets.data.listMAPSAssets.items), undefined, undefined, undefined);
+                if (nextNewToken !== null) {
+                    setNextToken(nextNewToken);
+                }
+            }
+        }
+        paginateAssets();
+    }, [nextToken]);
 
     // Handle media asset updates //
     const mediaAssetReducer = (state, action) => {

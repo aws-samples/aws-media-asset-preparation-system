@@ -1,7 +1,11 @@
 {
-  "version": "2018-05-29",
+  "version": "2017-02-28",
   "operation": "Scan",
-  "filter": #if($ctx.prev.result.arguments.filter) $util.transform.toDynamoDBFilterExpression($ctx.prev.result.arguments.filter) #else null #end,
-  "limit": $util.defaultIfNull($ctx.prev.result.limit, 20),
-  "nextToken": $util.toJson($util.defaultIfNullOrEmpty($ctx.prev.result.nextToken, null)),
+  "filter": #if($ctx.prev.result.arguments.filter) $util.transform.toDynamoDBFilterExpression($ctx.prev.result.arguments.filter) #else null #end
+  #if( ${context.arguments.limit} )
+        ,"limit": $util.toJson($context.arguments.limit)
+    #end
+    #if( ${context.arguments.nextToken} )
+        ,"nextToken": $util.toJson($context.arguments.nextToken)
+    #end
 }
