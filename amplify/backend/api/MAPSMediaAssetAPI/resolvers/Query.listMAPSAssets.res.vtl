@@ -12,7 +12,7 @@
 
 {
     #if($context.prev.result.arguments.allow)
-        "items": $utils.toJson($context.result.items)
+        "items": $util.toJson($context.result.items)
     #else
         $util.toJson({"items": []})
     #end
