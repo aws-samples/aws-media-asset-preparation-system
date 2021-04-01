@@ -30,6 +30,7 @@ ddb_client = boto3.client('dynamodb')
 ec2_client = boto3.client('ec2')
 ssm_client = boto3.client('ssm')
 
+ENV = os.environ['ENV']
 PERMISSIONS_DB_TABLE = os.environ['PERMISSIONS_DB_TABLE']
 ACTIVE_DB_TABLE = os.environ['ACTIVE_DB_TABLE']
 FSX_MOUNT = os.environ['FSX_MOUNT']
@@ -391,3 +392,43 @@ def update_folder_permissions(request_body, request_cxt):
         obj_response_body['reason'] = 'User does not have permissions to change folder access.'
     
     return util.generate_response_body(200, obj_response_body)
+
+def get_maps_config():
+    resp_body = {}
+
+    try:
+        resp = ssm_client.get_parameter(
+            Name=f'maps-bucket-{ENV}'
+        )
+
+        resp_body['bucket'] = resp['Parameter']['Value']
+    except Exception as e:
+        resp_body['bucket'] = ''
+
+    return util.generate_response_body(200, resp_body)
+
+def set_maps_config(request_body, request_cxt):
+    resp_body = {}
+    bucket = request_body['bucket_name']
+    groups = request_cxt['authorizer']['claims']['cognito:groups']
+
+    if 'admin' in groups:
+        try:
+            resp = ssm_client.put_parameter(
+                Name=f'maps-bucket-{ENV}',
+                Value=bucket,
+                Type='String',
+                Overwrite=True
+            )
+
+            resp_body['success'] = True
+        except Exception as e:
+            resp_body['success'] = False
+            resp_body['message'] = "Unable to set S3 bucket."
+    
+    else:
+        resp_body['success'] = False
+        resp_body['message'] = "Only admin can configure the S3 bucket."
+
+
+    return util.generate_response_body(200, resp_body)

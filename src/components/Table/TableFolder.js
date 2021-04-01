@@ -16,6 +16,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { emphasize, makeStyles } from '@material-ui/core/styles';
 
 import Link from '@material-ui/core/Link';
@@ -42,7 +43,8 @@ const useTableStyle = makeStyles(theme => ({
 
 function TableFolder(props) {
     const classes = useTableStyle();
-    const { bucketName, userGroups, allGroups, folder, labelId, deleteHandler, prefixHandler } = props;
+    const userGroups = useSelector(state => state.userConfig.userGroups);
+    const { folder, labelId, prefixHandler } = props;
     const [selected, setSelected] = useState(false);
     const [permissionOpen, setPermissionOpen] = useState(false);
     const [menuState, setContextMenuState] = useState({
@@ -132,9 +134,7 @@ function TableFolder(props) {
                 <MenuItem onClick={handlePermissionChange}>Permissions</MenuItem>
             </Menu>
             <PermissionsView 
-                bucketName={bucketName} 
                 folderName={folder.objKey} 
-                allGroups={allGroups} 
                 open={permissionOpen} 
                 permissions={folder.permissions} 
                 closeHandler={handlePermissionsClose}

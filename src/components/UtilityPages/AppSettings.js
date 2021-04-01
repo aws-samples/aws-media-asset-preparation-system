@@ -15,7 +15,8 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
 import MainToolbar from '../View/MainToolbar'
@@ -27,8 +28,9 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Dialog from '@material-ui/core/Dialog';
 import { Alert, AlertTitle } from '@material-ui/lab';
-import { ValidateBucket } from '../Utilities/APIInterface';
+import { ValidateBucket, SetMAPSBucket } from '../Utilities/APIInterface';
 import { BootstrapInput } from '../Custom/CustomComponents';
+import { setBucket, setPrefix } from '../../store/mapsconfig/mapsconfig';
 
 const settingsStyle = makeStyles(theme => ({
     customButton : {
@@ -53,11 +55,10 @@ const settingsStyle = makeStyles(theme => ({
   
 function AppSettings(props) {
     const classes = settingsStyle();
-    const { currBucketName, bucketChangeHandler } = props;
+    const currBucketName = useSelector(state => state.mapsConfig.bucket);
     const [localBucketName, setLocalBucketName] = useState(currBucketName);
-    const [settingsState, setSettingsState] = useState({
-        mapsBucketName: currBucketName
-    });
+    const dispatch = useDispatch();
+
     const [alertState, setAlertState] = useState({
         alertSev: 'error',
         alertMsg: 'Alert',
@@ -78,7 +79,19 @@ function AppSettings(props) {
             .then((response) => {
                 const respBody = response.data.body;
                 if (respBody['valid']) {
-                    bucketChangeHandler(localBucketName);
+                    SetMAPSBucket(localBucketName)
+                    .then((resp) => {
+                        if (resp.data.body['success']) {
+                            dispatch(setBucket(localBucketName));
+                            dispatch(setPrefix(''));
+                        } else {
+                            console.log(resp.data.body);
+                            console.log('error with setting bucket');
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
                 } else {
                     setAlertState({...alertState,
                         alertMsg: respBody['reason'],

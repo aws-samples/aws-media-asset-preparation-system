@@ -16,6 +16,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import Amplify from 'aws-amplify';
 import awsmobile from '../../aws-exports';
 import { makeStyles } from '@material-ui/core/styles';
@@ -55,8 +56,10 @@ const useStyles = makeStyles((theme) => ({
 
 function PermissionsView(props) {
     const classes = useStyles();
+    const bucketName = useSelector(state => state.mapsConfig.bucket);
+    const allGroups = useSelector(state => state.userConfig.allGroups);
     const [folderPermissions, setFolderPermissions] = useState(props.permissions);
-    const { bucketName, folderName, allGroups, closeHandler, savePermissionsHandler } = props;
+    const { folderName, closeHandler, savePermissionsHandler } = props;
     
     const handleClose = () => {
         setFolderPermissions(props.permissions);

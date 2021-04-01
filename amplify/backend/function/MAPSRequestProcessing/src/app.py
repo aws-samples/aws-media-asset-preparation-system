@@ -101,3 +101,12 @@ def update_folder_permissions():
 @app.route('/user/groups', methods=['GET'], authorizer=authorizer, cors=True)
 def get_user_groups():
     return s3_handler.get_user_groups(app.current_request.context)
+
+@app.route('/config', methods=['GET'], authorizer=authorizer, cors=True)
+def get_maps_config():
+    return ddb_handler.get_maps_config()
+
+@app.route('/config', methods=['POST'], authorizer=authorizer, cors=True)
+def set_maps_config():
+    request_body = json.loads(app.current_request.raw_body)
+    return ddb_handler.set_maps_config(request_body, app.current_request.context)

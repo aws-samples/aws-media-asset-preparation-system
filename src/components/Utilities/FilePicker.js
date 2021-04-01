@@ -16,6 +16,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 import AWS from 'aws-sdk';
 import { Auth } from 'aws-amplify';
@@ -128,7 +129,9 @@ function FilePicker(props) {
   const [inProgress, setInProgress] = useState(false);
   const [fileLabel, setFileLabel] = useState('No File Selected');
   const [uploadPercent, setUploadPercent] = useState(0);
-  const { bucketName, selectedPrefix, numSelected, selectedRows, alertHandler, closeHandler } = props;
+  const bucketName = useSelector(state => state.mapsConfig.bucket);
+  const selectedPrefix = useSelector(state => state.mapsConfig.prefix);
+  const { alertHandler, closeHandler } = props;
 
   const handleClose = () => {
     if (!inProgress) {

@@ -16,6 +16,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 import { emphasize, makeStyles } from '@material-ui/core/styles'
 import Tooltip from '@material-ui/core/Tooltip';
@@ -110,11 +111,10 @@ function ControlsToolbar(props) {
     const [bucketHierarchy, setHierarchy] = useState([]);
     const [viewLayout, setViewLayout] = useState('table');
     const hierarchyLen = bucketHierarchy.length;
+    const bucketName = useSelector(state => state.mapsConfig.bucket);
+    const selectedPrefix = useSelector(state => state.mapsConfig.prefix);
+    const userGroups = useSelector(state => state.userConfig.userGroups);
     const { 
-        bucketName, 
-        selectedPrefix, 
-        username,
-        userGroups,
         prefixChangeHandler, 
         viewLayoutChangeHandler, 
         selectedMediaAssets, 
@@ -195,6 +195,7 @@ function ControlsToolbar(props) {
     const handleDeleteClick = () => {
         console.log('Handle delete click');
         const numSelected = selectedMediaAssets.length;
+        console.log(numSelected);
         if ( numSelected <= 0) {
             alertHandler('error', 'Error', ['No assets selected to delete.']);
         } else {
@@ -299,7 +300,7 @@ function ControlsToolbar(props) {
 
                     <Link to="/settings">
                         <Tooltip title="Settings">
-                            <IconButton>
+                            <IconButton style={{display: userGroups.includes('admin') ? 'inline' : 'none'}}>
                                 <Avatar className={classes.avatarStyle}>
                                     <SettingsIcon style={{fill: 'white'}}/>
                                 </Avatar>
@@ -309,8 +310,8 @@ function ControlsToolbar(props) {
                 </section>
             </Toolbar>
         </AppBar>
-        <FilePicker bucketName={bucketName} selectedPrefix={selectedPrefix} numSelected={selectedMediaAssets.length} selectedRows={selectedMediaAssets} alertHandler={alertHandler} open={open} closeHandler={handleClose}/>
-        <FolderCreation bucketName={bucketName} selectedPrefix={selectedPrefix} username={username} userGroups={userGroups} alertHandler={alertHandler} open={folderOpen} closeHandler={handleFolderClose} newFolderHandler={folderHandler}/>
+        <FilePicker numSelected={selectedMediaAssets.length} selectedRows={selectedMediaAssets} alertHandler={alertHandler} open={open} closeHandler={handleClose}/>
+        <FolderCreation alertHandler={alertHandler} open={folderOpen} closeHandler={handleFolderClose} newFolderHandler={folderHandler}/>
         </>
     );
 };

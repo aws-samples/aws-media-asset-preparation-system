@@ -16,7 +16,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import React, { useState, useEffect, useReducer } from 'react';
-import { Auth, API, graphqlOperation } from 'aws-amplify';
+import { useDispatch, useSelector } from 'react-redux';
+import { API, graphqlOperation } from 'aws-amplify';
 import MainToolbar from './MainToolbar';
 import ControlsToolbar from './ControlsToolbar';
 import TableAssetView from '../Table/TableAssetView';
@@ -30,11 +31,15 @@ import { onCreateMapsAssets, onUpdateMapsAssets, onDeleteMapsAssets } from '../.
 import { getBucketKey } from '../Utilities/FormatUtil';
 import { GetBucketFolders, GetUserGroups } from '../Utilities/APIInterface';
 import { stableSort, getComparator } from '../Utilities/TableSortUtil';
+import { setPrefix } from '../../store/mapsconfig/mapsconfig';
+import { setAllGroups } from '../../store/user/user';
 
 import ContextMenu from '../Utilities/ContextMenu';
 
 export default function MainAssetViewer(props) {
-    const { bucketName } = props;
+    const configDispatch = useDispatch();
+    const bucketName = useSelector(state => state.mapsConfig.bucket);
+    const selectedPrefix = useSelector(state => state.mapsConfig.prefix);
     const [alertState, setAlertState] = useState({
         severity: 'error',
         title: 'Error',
@@ -52,24 +57,15 @@ export default function MainAssetViewer(props) {
         mouseX: null,
         mouseY: null
     });
-    const [selectedPrefix, setSelectedPrefix] = useState(
-        localStorage.getItem('MapsSelectedPrefix') || ''
-    );
+
     const [viewLayout, setViewLayout] = useState('table');
     const [filteringState, setFilteringState] = useState({
         order: 'desc',
         orderBy: 'lastModifiedDate',
         searchTerm: ''
     });
-
-    const [username, setUsername] = useState('');
-    const [userGroups, setUserGroups] = useState([]);
-    const [allGroups, setAllGroups] = useState([]);
+    
     const paginationLimit = 500;
-
-    useEffect(() => {
-        localStorage.setItem('MapsSelectedPrefix', selectedPrefix);
-    }, [selectedPrefix]);
 
     useEffect(() => {
         localStorage.setItem('viewLayout', viewLayout);
@@ -78,7 +74,7 @@ export default function MainAssetViewer(props) {
     // HANDLERS //
     const handlePrefixChange = (event, folderKey) => {
         event.preventDefault();
-        setSelectedPrefix(folderKey);
+        configDispatch(setPrefix(folderKey));
         unselectMediaAssetsHandler();
     };
 
@@ -104,6 +100,7 @@ export default function MainAssetViewer(props) {
             key = asset.objKey;
         } else {
             key = getBucketKey(asset.bucketObjKey).key;
+            console.log(key);
         }
 
         selectedIndex = selectedMediaAssets.findIndex((val) => {
@@ -137,7 +134,6 @@ export default function MainAssetViewer(props) {
 
     const updateFolderHandler = (folderObj) => {
         setBucketFolders([...bucketFolders, folderObj]);
-
     };
 
     const deleteFolderHandler = (folderName) => {
@@ -290,6 +286,7 @@ export default function MainAssetViewer(props) {
                 }
             }
         }
+
         paginateAssets();
     }, [nextToken]);
 
@@ -400,43 +397,28 @@ export default function MainAssetViewer(props) {
         }
     }, []);
 
-    const userSessionReducer = (state, action) => {
-        setUsername(action.data.username);
-        setUserGroups(action.data.userGroups);
-        setAllGroups(action.data.allGroups);
-    };
-
-    const [emptyState2, sessionDispatch] = useReducer(userSessionReducer);
-
-    async function configureUserInfo() {
-        const user = await Auth.currentAuthenticatedUser();
-        const groupRes = await GetUserGroups();
-        let groups = [];
-        if (groupRes.data.body.hasOwnProperty('groups')) {
-            groups = groupRes.data.body.groups;
-        } else if(groupRes.data.body.hasOwnProperty('reason')) {
-            mainAlertHandler('error', 'Error', groupRes.data.body.reason);
-        }
-
-        sessionDispatch({data: {
-            allGroups: groups, 
-            username: user.username, 
-            userGroups: user.signInUserSession.accessToken.payload["cognito:groups"]
-        }});
-    };
-
     useEffect(() => {
-        configureUserInfo();
+        async function GetCognitoGroups() {
+            GetUserGroups()
+            .then((groupRes) => {
+                if (groupRes.data.body.hasOwnProperty('groups')) {
+                    configDispatch(setAllGroups(groupRes.data.body.groups));
+                } else if(groupRes.data.body.hasOwnProperty('reason')) {
+                    mainAlertHandler('error', 'Error', groupRes.data.body.reason);
+                }
+            })
+            .catch((error) => {
+                console.log('Error', error);
+            });
+        };
+
+        GetCognitoGroups();
     }, []);
 
     // CONDITIONAL VIEWS //
     function ViewLayoutDisplay() {
         if (viewLayout === "table") {
             return ( <TableAssetView 
-                        bucketName={bucketName} 
-                        selectedPrefix={selectedPrefix} 
-                        userGroups={userGroups}
-                        allGroups={allGroups}
                         filteredAssets={filteredAssets}
                         filterHandler={assetFilterHandler}
                         filterState={filteringState}
@@ -450,8 +432,6 @@ export default function MainAssetViewer(props) {
                         rightClickHandler={handleRightClickMenu} /> );
         } else {
             return ( <CardAssetView 
-                        bucketName={bucketName} 
-                        selectedPrefix={selectedPrefix} 
                         filteredAssets={filteredAssets} 
                         topLevelSelectedHandler={selectedAssetHandler} 
                         selectedMediaAssets={selectedMediaAssets}
@@ -461,12 +441,8 @@ export default function MainAssetViewer(props) {
 
     return (
         <>
-            <MainToolbar username={username} userGroups={userGroups}/>
+            <MainToolbar />
             <ControlsToolbar 
-                bucketName={bucketName} 
-                selectedPrefix={selectedPrefix} 
-                username={username}
-                userGroups={userGroups}
                 prefixChangeHandler={handlePrefixChange} 
                 viewLayoutChangeHandler={handleViewLayoutChange} 
                 selectedMediaAssets={selectedMediaAssets}
@@ -491,7 +467,6 @@ export default function MainAssetViewer(props) {
             </Dialog>
 
             <ContextMenu 
-                bucketName={bucketName} 
                 menuState={contextMenuState} 
                 closeHandler={rightClickCloseHandler} 
                 selectedAssets={selectedMediaAssets} 
