@@ -16,6 +16,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 import AWS from 'aws-sdk';
 import awsmobile from '../../aws-exports';
@@ -103,7 +104,11 @@ const useStyles = makeStyles({
 function FolderCreation(props) {
     const classes = useStyles();
     const [folderName, setFolderName] = useState('');
-    const { bucketName, selectedPrefix, username, userGroups, alertHandler, closeHandler, newFolderHandler } = props;
+    const bucketName = useSelector(state => state.mapsConfig.bucket);
+    const selectedPrefix = useSelector(state => state.mapsConfig.prefix);
+    const username = useSelector(state => state.userConfig.user);
+    const userGroups = useSelector(state => state.userConfig.userGroups);
+    const { alertHandler, closeHandler, newFolderHandler } = props;
 
     const handleClose = () => {
         setFolderName('');

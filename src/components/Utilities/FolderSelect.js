@@ -16,6 +16,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { makeStyles, emphasize } from '@material-ui/core/styles';
 
 import List from '@material-ui/core/List';
@@ -84,7 +85,8 @@ const useStyles = makeStyles((theme) => ({
 
 function FolderSelect(props) {
     const classes = useStyles();
-    const { bucketName, closeHandler, moveFilesHandler, numSelected } = props;
+    const bucketName = useSelector(state => state.mapsConfig.bucket);
+    const { closeHandler, moveFilesHandler, numSelected } = props;
     const [localPrefix, setLocalPrefix] = useState('');
     const [localFolders, setLocalFolders] = useState([]);
     const [bucketHierarchy, setHierarchy] = useState([]);

@@ -16,6 +16,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -24,8 +25,9 @@ import FolderSelect from '../Utilities/FolderSelect';
 import { RenameMoveObjRequest, MoveToFsxRequest } from '../Utilities/APIInterface';
   
 function ContextMenu(props) {
+    const bucketName = useSelector(state => state.mapsConfig.bucket);
     const [folderSelectOpen, setFolderSelectOpen] = useState(false);
-    const { bucketName, menuState, closeHandler, selectedAssets, unselectAssetHandler, alertHandler } = props;
+    const { menuState, closeHandler, selectedAssets, unselectAssetHandler, alertHandler } = props;
 
     const handleClose = () => {
         closeHandler();
@@ -82,7 +84,7 @@ function ContextMenu(props) {
             <MenuItem onClick={moveToFsx}>Copy To FSx</MenuItem>
             <MenuItem onClick={removeFromFsx}>Remove From FSx</MenuItem>
         </Menu>
-        <FolderSelect bucketName={bucketName} closeHandler={handleFolderSelectClose} open={folderSelectOpen} moveFilesHandler={moveFilesHandler} numSelected={selectedAssets.length}/>
+        <FolderSelect closeHandler={handleFolderSelectClose} open={folderSelectOpen} moveFilesHandler={moveFilesHandler} numSelected={selectedAssets.length}/>
         </>
     );
 };

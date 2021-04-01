@@ -16,6 +16,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { Auth } from 'aws-amplify'
 
 import { emphasize, makeStyles } from '@material-ui/core/styles'
@@ -82,8 +83,7 @@ const useToolbarStyle = makeStyles({
 
 function MainToolbar(props) {
     const classes = useToolbarStyle();
-    const username = props.username;
-    const userGroups = props.userGroups;
+    const username = useSelector(state => state.userConfig.user);
 
     // On-click Handlers //
     const handleProfileClick = () => {

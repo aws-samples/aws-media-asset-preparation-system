@@ -364,6 +364,177 @@
                       }
                     }
                 },
+                "/config": {
+                    "get" : {
+                        "produces" : [ "application/json" ],
+                        "parameters" : [ {
+                          "name" : "Authorization",
+                          "in" : "header",
+                          "required" : false,
+                          "type" : "string"
+                        } ],
+                        "responses" : {
+                          "200" : {
+                            "description" : "200 response",
+                            "schema" : {
+                              "$ref" : "#/definitions/Empty"
+                            },
+                            "headers" : {
+                                "Access-Control-Allow-Origin" : {
+                                  "type" : "string"
+                                }
+                            }
+                          }
+                        },
+                        "security" : [ {
+                          "maps-cognito-authorizer" : [ ]
+                        } ],
+                        "x-amazon-apigateway-integration" : {
+                          "uri": {
+                                "Fn::Join": [
+                                "",
+                                [
+                                    "arn:aws:apigateway:",
+                                    {
+                                    "Ref": "AWS::Region"
+                                    },
+                                    ":lambda:path/2015-03-31/functions/",
+                                    {
+                                        "Ref": "functionMAPSRequestProcessingArn"
+                                    },
+                                    "/invocations"
+                                ]
+                                ]
+                            },
+                          "responses" : {
+                            "default" : {
+                              "statusCode" : "200",
+                              "responseParameters" : {
+                                "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                              }
+                            }
+                          },
+                          "passthroughBehavior" : "when_no_match",
+                          "httpMethod" : "POST",
+                          "contentHandling" : "CONVERT_TO_TEXT",
+                          "type" : "aws_proxy"
+                        }
+                    },
+                    "post" : {
+                        "consumes" : [ "application/json" ],
+                        "produces" : [ "application/json" ],
+                        "parameters" : [ {
+                          "name" : "Authorization",
+                          "in" : "header",
+                          "required" : true,
+                          "type" : "string"
+                        }, {
+                          "in" : "body",
+                          "name" : "CommonModel",
+                          "required" : true,
+                          "schema" : {
+                            "$ref" : "#/definitions/CommonModel"
+                          }
+                        } ],
+                        "responses" : {
+                          "200" : {
+                            "description" : "200 response",
+                            "schema" : {
+                              "$ref" : "#/definitions/CommonModel"
+                            },
+                            "headers" : {
+                              "Access-Control-Allow-Origin" : {
+                                "type" : "string"
+                              }
+                            }
+                          },
+                          "401" : {
+                            "description" : "401 response",
+                            "schema" : {
+                              "$ref" : "#/definitions/CommonModel"
+                            },
+                            "headers" : {
+                              "Access-Control-Allow-Origin" : {
+                                "type" : "string"
+                              }
+                            }
+                          }
+                        },
+                        "security" : [ {
+                          "maps-cognito-authorizer" : [ ]
+                        } ],
+                        "x-amazon-apigateway-integration" : {
+                          "uri": {
+                                "Fn::Join": [
+                                "",
+                                [
+                                    "arn:aws:apigateway:",
+                                    {
+                                    "Ref": "AWS::Region"
+                                    },
+                                    ":lambda:path/2015-03-31/functions/",
+                                    {
+                                        "Ref": "functionMAPSRequestProcessingArn"
+                                    },
+                                    "/invocations"
+                                ]
+                                ]
+                            },
+                          "responses" : {
+                            "default" : {
+                              "statusCode" : "200",
+                              "responseParameters" : {
+                                "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                              }
+                            }
+                          },
+                          "passthroughBehavior" : "when_no_match",
+                          "httpMethod" : "POST",
+                          "contentHandling" : "CONVERT_TO_TEXT",
+                          "type" : "aws_proxy"
+                        }
+                    },
+                    "options" : {
+                        "consumes" : [ "application/json" ],
+                        "produces" : [ "application/json" ],
+                        "responses" : {
+                          "200" : {
+                            "description" : "200 response",
+                            "schema" : {
+                              "$ref" : "#/definitions/Empty"
+                            },
+                            "headers" : {
+                              "Access-Control-Allow-Origin" : {
+                                "type" : "string"
+                              },
+                              "Access-Control-Allow-Methods" : {
+                                "type" : "string"
+                              },
+                              "Access-Control-Allow-Headers" : {
+                                "type" : "string"
+                              }
+                            }
+                          }
+                        },
+                        "x-amazon-apigateway-integration" : {
+                          "responses" : {
+                            "default" : {
+                              "statusCode" : "200",
+                              "responseParameters" : {
+                                "method.response.header.Access-Control-Allow-Methods" : "'OPTIONS,POST,GET'",
+                                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                                "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                              }
+                            }
+                          },
+                          "requestTemplates" : {
+                            "application/json" : "{\"statusCode\": 200}"
+                          },
+                          "passthroughBehavior" : "when_no_match",
+                          "type" : "mock"
+                        }
+                    }
+                },
                 "/delete" : {
                     "post" : {
                       "consumes" : [ "application/json" ],
@@ -1649,6 +1820,48 @@
                           "Ref": "MAPSFrontEndAPI"
                        },
                        "path": "/*/GET/bucket"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIConfigGet": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/GET/config"
+                    }
+                ]
+            }
+        }
+    },
+    "functionMAPSRequestProcessingPermissionMAPSFrontEndAPIConfigPost": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "FunctionName": {
+                "Ref": "functionMAPSRequestProcessingName"
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+                "Fn::Sub":[
+                    "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${frontendapi}${path}",
+                    {
+                       "frontendapi":{
+                          "Ref": "MAPSFrontEndAPI"
+                       },
+                       "path": "/*/POST/config"
                     }
                 ]
             }

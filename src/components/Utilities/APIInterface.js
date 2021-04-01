@@ -260,6 +260,25 @@ async function ValidateBucket(bucketName) {
     });
 };
 
+async function SetMAPSBucket(bucketName) {
+    const auth = await Auth.currentSession();
+    return API.post(apiName, "/config", {
+        headers: {Authorization: auth.idToken.jwtToken},
+        response: true,
+        body: {
+            bucket_name: bucketName
+        }
+    });
+};
+
+async function GetMAPSBucket() {
+    const auth = await Auth.currentSession();
+    return API.get(apiName, "/config", {
+        headers: {Authorization: auth.idToken.jwtToken},
+        response: true
+    });
+};
+
 async function GetObjectInfo(bucketName, key) {
 
   const auth = await Auth.currentSession();
@@ -379,5 +398,7 @@ export {
   MoveToFsxRequest,
   GetFolderPermissions,
   UpdateFolderPermissions,
-  GetUserGroups
+  GetUserGroups,
+  SetMAPSBucket,
+  GetMAPSBucket
 };
