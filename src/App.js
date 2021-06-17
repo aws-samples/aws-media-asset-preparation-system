@@ -16,6 +16,7 @@ Amplify.configure(awsmobile);
 
 function App() {
     const dispatch = useDispatch();
+    const user = await Auth.currentAuthenticatedUser();
 
     useEffect(() => {
         async function ConfigureBucket() {
@@ -28,7 +29,6 @@ function App() {
 
     useEffect(() => {
         async function ConfigureUserInfo() {
-            const user = await Auth.currentAuthenticatedUser();
             dispatch(setUser(user.username));
             dispatch(setUserGroups(user.signInUserSession.accessToken.payload["cognito:groups"]));
         }
