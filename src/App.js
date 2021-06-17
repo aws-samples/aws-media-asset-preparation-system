@@ -16,7 +16,7 @@ Amplify.configure(awsmobile);
 
 function App() {
     const dispatch = useDispatch();
-    const user = await Auth.currentAuthenticatedUser();
+    const user = Auth.currentAuthenticatedUser();
 
     useEffect(() => {
         async function ConfigureBucket() {
