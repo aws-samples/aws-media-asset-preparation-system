@@ -36,7 +36,7 @@ function App() {
         ConfigureUserInfo();
     }, []);
 
-    return (
+    return authState === AuthState.SignedIn && user ? (
         <BrowserRouter>
             <Route
                 exact
@@ -49,7 +49,11 @@ function App() {
                 component={() => <AppSettings />}
             />
         </BrowserRouter>
+    ) : (
+        <AmplifyAuthenticator >
+            <AmplifySignIn slot="sign-in" hideSignUp={true} />
+        </AmplifyAuthenticator>
     );
 };
 
-export default withAuthenticator(App, false);
+export default App;
