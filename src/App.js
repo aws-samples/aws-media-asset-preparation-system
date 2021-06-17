@@ -1,6 +1,6 @@
 import Amplify from 'aws-amplify';
 import { Auth } from 'aws-amplify';
-import { withAuthenticator } from 'aws-amplify-react';
+import { AmplifyAuthenticator } from 'aws-amplify-react';
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import awsmobile from './aws-exports';
@@ -36,7 +36,7 @@ function App() {
         ConfigureUserInfo();
     }, []);
 
-    return authState === AuthState.SignedIn && user ? (
+    return user ? (
         <BrowserRouter>
             <Route
                 exact
