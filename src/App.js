@@ -1,6 +1,6 @@
 import Amplify from 'aws-amplify';
 import { Auth } from 'aws-amplify';
-import { AmplifyAuthenticator } from 'aws-amplify-react';
+import { AmplifyAuthenticator, AmplifySignIn } from 'aws-amplify-react';
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import awsmobile from './aws-exports';
