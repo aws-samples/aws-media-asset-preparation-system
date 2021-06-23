@@ -37,6 +37,7 @@ FSX_MOUNT = os.environ['FSX_MOUNT']
 REGION = os.environ['REGION']
 SSM_OUTPUT_BUCKET = os.environ['SSM_OUTPUT_BUCKET']
 SSM_OUTPUT_PREFIX = os.environ['SSM_OUTPUT_PREFIX']
+FILE_TRANSFER_IP = os.environ['FILE_TRANSFER_IP']
 
 ddb_deserialize = TypeDeserializer().deserialize
 ddb_serialize = TypeSerializer().serialize
@@ -229,7 +230,8 @@ def handle_fsx_move_req(request_body, request_cxt, curr_req):
     keys = request_body['keys']
     moveType = request_body['moveType']
     user = request_cxt['authorizer']['claims']['cognito:username']
-    sourceIp = request_cxt['identity']['sourceIp']
+    #sourceIp = request_cxt['identity']['sourceIp']
+    sourceIp = FILE_TRANSFER_IP
     instanceId = None
 
     # Get instance ID from source IP
