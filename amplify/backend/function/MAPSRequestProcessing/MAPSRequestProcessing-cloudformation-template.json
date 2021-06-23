@@ -86,7 +86,8 @@
             "SSM_OUTPUT_BUCKET": {
               "Ref": "resMAPSSSMOutputBucketName"
             },
-            "SSM_OUTPUT_PREFIX": "MAPS"
+            "SSM_OUTPUT_PREFIX": "MAPS",
+            "FILE_TRANSFER_IP": "IPADRESS"
           }
         },
         "Role": {
