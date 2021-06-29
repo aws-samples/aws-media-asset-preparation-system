@@ -32,14 +32,17 @@ function App() {
     useEffect(() => {
         async function ConfigureUserInfo() {
             const user = await Auth.currentAuthenticatedUser();
-            onAuthUIStateChange((nextAuthState, authData) => {
-                dispatch(setUser(authData));
-                dispatch(setUserGroups(user.signInUserSession.accessToken.payload["cognito:groups"]));
-                setAuthState(nextAuthState);
-            });
+            dispatch(setUser(user.username));
+            dispatch(setUserGroups(user.signInUserSession.accessToken.payload["cognito:groups"]));
         }
 
         ConfigureUserInfo();
+    }, []);
+
+    useEffect(() => {
+        return onAuthUIStateChange((nextAuthState, authData) => {
+            setAuthState(nextAuthState);
+        });
     }, []);
 
     return authState === AuthState.SignedIn && user ? (
