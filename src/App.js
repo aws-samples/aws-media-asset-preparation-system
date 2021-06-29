@@ -1,8 +1,7 @@
-import React from 'react';
 import Amplify from 'aws-amplify';
 import { Auth } from 'aws-amplify';
-import { AmplifyAuthenticator, AmplifySignIn } from '@aws-amplify/ui-react';
-import { AuthState } from '@aws-amplify/ui-components';
+import {AmplifyAuthenticator, AmplifySignIn} from "@aws-amplify/ui-react";
+import {AuthState, onAuthUIStateChange} from "@aws-amplify/ui-components";
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import awsmobile from './aws-exports';
@@ -19,7 +18,8 @@ Amplify.configure(awsmobile);
 function App() {
     const dispatch = useDispatch();
     const [authState, setAuthState] = React.useState();
-    
+    const [user] = React.useState();
+
     useEffect(() => {
         async function ConfigureBucket() {
             const resp = await GetMAPSBucket();
@@ -32,14 +32,17 @@ function App() {
     useEffect(() => {
         async function ConfigureUserInfo() {
             const user = await Auth.currentAuthenticatedUser();
-            dispatch(setUser(user.username));
-            dispatch(setUserGroups(user.signInUserSession.accessToken.payload["cognito:groups"]));
+            onAuthUIStateChange((nextAuthState, authData) => {
+                dispatch(setUser(authData));
+                dispatch(setUserGroups(user.signInUserSession.accessToken.payload["cognito:groups"]));
+                setAuthState(nextAuthState);
+            });
         }
 
         ConfigureUserInfo();
     }, []);
 
-    return authState === AuthState.SignedIn ? (
+    return authState === AuthState.SignedIn && user ? (
         <BrowserRouter>
             <Route
                 exact
