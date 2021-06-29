@@ -94,6 +94,7 @@ function MainToolbar(props) {
         Auth.signOut()
         .then((data) => {
             localStorage.setItem('mapsSelectedPrefix', '');
+            document.location.reload();
         })
         .catch(err => console.log(err));
     };
