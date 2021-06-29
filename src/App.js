@@ -37,9 +37,6 @@ function App() {
         }
 
         ConfigureUserInfo();
-    }, []);
-
-    useEffect(() => {
         return onAuthUIStateChange((nextAuthState, authData) => {
             setAuthState(nextAuthState);
         });
