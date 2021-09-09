@@ -6,7 +6,7 @@
     "@material-ui/core": "^4.9.11",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.50",
-    "aws-amplify": "^3.3.14",
+    "aws-amplify": "^4.2.8",
     "aws-amplify-react": "^2.6.3",
     "aws-sdk": "^2.663.0",
     "bootstrap": "^4.4.1",
@@ -24,7 +24,6 @@
     "react-player": "^2.6.2",
     "react-redux": "^7.2.3",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^4.0.3",
     "redux": "^4.0.5",
     "styled-components": "^5.0.1"
   },

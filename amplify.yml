@@ -23,6 +23,7 @@ frontend:
     preBuild:
       commands:
         - npm ci
+        - npm install react-scripts
     build:
       commands:
         - npm run build
