@@ -190,6 +190,10 @@ Resources:
       
       
       AutoVerifiedAttributes: !Ref autoVerifiedAttributes
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: admin_only
+            Priority: 1
       AdminCreateUserConfig: 
         AllowAdminCreateUserOnly: true
       
