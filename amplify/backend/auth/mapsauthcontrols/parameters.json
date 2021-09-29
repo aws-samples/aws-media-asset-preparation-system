@@ -6,7 +6,7 @@
     "autoVerifiedAttributes": [
         "email"
     ],
-    "mfaConfiguration": "OFF
+    "mfaConfiguration": "OFF"
     "mfaTypes": [
         "SMS Text Message"
     ],
