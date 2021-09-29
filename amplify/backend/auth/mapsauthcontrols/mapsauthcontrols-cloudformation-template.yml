@@ -181,7 +181,7 @@ Resources:
         
         
         
-          PostConfirmation: !Ref functionmapsauthcontrolsPostConfirmationArn
+          PostAuthentication: !Ref functionmapsauthcontrolsPostConfirmationArn
         
         
         
