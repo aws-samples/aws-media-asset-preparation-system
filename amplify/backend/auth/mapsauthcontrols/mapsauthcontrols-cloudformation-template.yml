@@ -205,7 +205,7 @@ Resources:
           RequireUppercase: false
           
       MfaConfiguration: !Ref mfaConfiguration
-      EnabledMfas: !Ref mfaType
+      EnabledMfas: !Ref mfaTypes
       SmsVerificationMessage: !Ref smsVerificationMessage
       SmsConfiguration: 
         SnsCallerArn: !GetAtt SNSRole.Arn
