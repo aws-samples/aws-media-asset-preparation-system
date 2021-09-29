@@ -6,9 +6,9 @@
     "autoVerifiedAttributes": [
         "email"
     ],
-    "mfaConfiguration": "OFF"
+    "mfaConfiguration": "ON"
     "mfaTypes": [
-        "SMS Text Message"
+        "SOFTWARE_TOKEN_MFA"
     ],
     "smsAuthenticationMessage": "Your authentication code is {####}",
     "smsVerificationMessage": "Your verification code is {####}",
