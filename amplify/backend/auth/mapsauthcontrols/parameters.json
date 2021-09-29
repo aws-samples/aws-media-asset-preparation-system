@@ -6,7 +6,7 @@
     "autoVerifiedAttributes": [
         "email"
     ],
-    "mfaConfiguration": "ON"
+    "mfaConfiguration": "ON",
     "mfaTypes": [
         "SOFTWARE_TOKEN_MFA"
     ],
