@@ -8,7 +8,7 @@
     ],
     "mfaConfiguration": "ON",
     "mfaTypes": [
-        "SMS_MFA"
+        "SMS_MFA", "SOFTWARE_TOKEN_MFA"
     ],
     "smsAuthenticationMessage": "Your authentication code is {####}",
     "smsVerificationMessage": "Your verification code is {####}",
