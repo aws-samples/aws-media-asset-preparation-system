@@ -190,7 +190,8 @@ Resources:
       
       
       AutoVerifiedAttributes: !Ref autoVerifiedAttributes
-      
+      AdminCreateUserConfig: 
+        AllowAdminCreateUserOnly: true
       
       EmailVerificationMessage: !Ref emailVerificationMessage
       EmailVerificationSubject: !Ref emailVerificationSubject
@@ -204,6 +205,7 @@ Resources:
           RequireUppercase: false
           
       MfaConfiguration: !Ref mfaConfiguration
+      EnabledMfas: !Ref mfaType
       SmsVerificationMessage: !Ref smsVerificationMessage
       SmsConfiguration: 
         SnsCallerArn: !GetAtt SNSRole.Arn
