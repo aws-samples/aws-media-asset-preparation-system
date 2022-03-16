@@ -82,6 +82,13 @@
           "attributes": [
             "MAPSFolderPermissionsTable"
           ]
+        },
+        {
+          "category": "res",
+          "resourceName": "MAPS",
+          "attributes": [
+            "MAPSQueueKeyId"
+          ]
         }
       ]
     },
@@ -171,7 +178,8 @@
           "resourceName": "MAPS",
           "attributes": [
             "MAPSQueueArn",
-            "MediaMetadataBucketName"
+            "MediaMetadataBucketName",
+            "MAPSQueueKeyId"
           ]
         },
         {

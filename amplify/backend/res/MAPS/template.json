@@ -20,27 +20,97 @@
         }
     },
     "Resources": {
-        "MAPSQueue": {
-            "Type": "AWS::SQS::Queue",
+        "MAPSQueueKey": {
+            "Type": "AWS::KMS::Key",
             "Properties": {
-                "DelaySeconds": 0,
-                "MaximumMessageSize": 262144,
-                "MessageRetentionPeriod": 900,
-                "QueueName": {
-                    "Fn::Sub": [
-                        "MAPS-Thumbnail-Processing-Queue-${env}",
-                        {
-                            "env": {
-                                "Ref": "env"
-                            }
-                        }
-                    ]
-                },
-                "ReceiveMessageWaitTimeSeconds": 0,
-                "VisibilityTimeout": 900
+              "Description": "KMS Key used to encrypt SQS at rest.",
+              "EnableKeyRotation": true,
+              "PendingWindowInDays": 20,
+              "KeyPolicy": {
+                "Version": "2012-10-17",
+                "Id": "key-default-1",
+                "Statement": [
+                  {
+                    "Sid": "S3 event notification permissions",
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": "s3.amazonaws.com"
+                    },
+                    "Action": [
+                      "kms:GenerateDataKey",
+                      "kms:Decrypt"
+                    ],
+                    "Resource": "*"
+                  },
+                  {
+                    "Sid": "Lambda permissions",
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": "lambda.amazonaws.com"
+                    },
+                    "Action": [
+                      "kms:GenerateDataKey",
+                      "kms:Decrypt"
+                    ],
+                    "Resource": "*"
+                  },
+                  {
+                    "Sid": "Account permissions",
+                    "Effect": "Allow",
+                    "Principal": {
+                      "AWS": {
+                        "Fn::Sub": [
+                          "arn:aws:iam::${AWS::AccountId}:root",
+                          {}
+                        ]
+                      }
+                    },
+                    "Action": "kms:*",
+                    "Resource": "*"
+                  }
+                ]
+              }
+            }
+          },
+          "MAPSQueueKeyAlias": {
+            "Type": "AWS::KMS::Alias",
+            "DependsOn": [
+              "MAPSQueueKey"
+            ],
+            "Properties": {
+              "AliasName": "alias/MAPS/queue-key",
+              "TargetKeyId": {
+                "Ref": "MAPSQueueKey"
+              }
+            }
+          },
+          "MAPSQueue": {
+            "Type": "AWS::SQS::Queue",
+            "DependsOn": [
+              "MAPSQueueKeyAlias"
+            ],
+            "Properties": {
+              "DelaySeconds": 0,
+              "MaximumMessageSize": 262144,
+              "MessageRetentionPeriod": 900,
+              "KmsMasterKeyId": {
+                "Ref": "MAPSQueueKeyAlias"
+              },
+              "KmsDataKeyReusePeriodSeconds": 1800,
+              "QueueName": {
+                "Fn::Sub": [
+                  "MAPS-Thumbnail-Processing-Queue-${env}",
+                  {
+                    "env": {
+                      "Ref": "env"
+                    }
+                  }
+                ]
+              },
+              "ReceiveMessageWaitTimeSeconds": 0,
+              "VisibilityTimeout": 900
             }
         },
-
         "MAPSQueuePolicy": {
             "Type": "AWS::SQS::QueuePolicy",
             "DependsOn": ["MAPSQueue"],
@@ -247,6 +317,14 @@
     },
 
     "Outputs": {
+        "MAPSQueueKeyId": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "MAPSQueueKey",
+                    "KeyId"
+                ]
+            }
+        },
         "MAPSQueueArn": {
             "Value": {
                 "Fn::GetAtt": [
