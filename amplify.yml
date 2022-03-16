@@ -3,7 +3,7 @@ backend:
   phases:
     preBuild:
       commands:
-        - npm install -g @aws-amplify/cli@4.43.0
+        - npm install -g @aws-amplify/cli@4.52.0
         - export BASE_PATH=$(pwd)
         - yum install -y gcc openssl-devel bzip2-devel libffi-devel python3.8-pip
         - cd /opt && wget https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tgz
