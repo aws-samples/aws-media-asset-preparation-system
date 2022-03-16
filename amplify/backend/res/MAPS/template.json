@@ -71,8 +71,8 @@
                 ]
               }
             }
-          },
-          "MAPSQueueKeyAlias": {
+        },
+        "MAPSQueueKeyAlias": {
             "Type": "AWS::KMS::Alias",
             "DependsOn": [
               "MAPSQueueKey"
@@ -83,8 +83,8 @@
                 "Ref": "MAPSQueueKey"
               }
             }
-          },
-          "MAPSQueue": {
+        },
+        "MAPSQueue": {
             "Type": "AWS::SQS::Queue",
             "DependsOn": [
               "MAPSQueueKeyAlias"
