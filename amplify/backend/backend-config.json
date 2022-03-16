@@ -82,13 +82,6 @@
           "attributes": [
             "MAPSFolderPermissionsTable"
           ]
-        },
-        {
-          "category": "res",
-          "resourceName": "MAPS",
-          "attributes": [
-            "MAPSQueueKeyId"
-          ]
         }
       ]
     },

@@ -13,9 +13,6 @@
     },
     "s3Key": {
       "Type": "String"
-    },
-    "resMAPSMAPSQueueKeyId": {
-      "Type": "String"
     }
   },
   "Conditions": {
@@ -174,22 +171,6 @@
                   {
                     "permtable": {
                       "Ref": "tablesMAPSTablesMAPSFolderPermissionsTable"
-                    }
-                  }
-                ]
-              }
-            },
-            {
-              "Effect": "Allow",
-              "Action": [
-                "kms:Decrypt"
-              ],
-              "Resource": {
-                "Fn::Sub": [
-                  "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${KeyId}",
-                  {
-                    "KeyId": {
-                      "Ref": "resMAPSMAPSQueueKeyId"
                     }
                   }
                 ]
