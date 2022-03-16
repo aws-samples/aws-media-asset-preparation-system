@@ -1,209 +1,228 @@
 {
-    "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Lambda Function resource stack creation using Amplify CLI",
-    "Parameters": {
-      "env": {
-        "Type": "String"
-      },
-      "tablesMAPSTablesMAPSFolderPermissionsTable": {
-        "Type": "String"
-      },
-      "deploymentBucketName": {
-        "Type": "String"
-      },
-      "s3Key": {
-        "Type": "String"
-      }
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Parameters": {
+    "env": {
+      "Type": "String"
     },
-    "Conditions": {
-      "ShouldNotCreateEnvResources": {
-        "Fn::Equals": [
-          {
-            "Ref": "env"
-          },
-          "NONE"
-        ]
-      }
+    "tablesMAPSTablesMAPSFolderPermissionsTable": {
+      "Type": "String"
     },
-    "Resources": {
-      "LambdaFunction": {
-        "Type": "AWS::Lambda::Function",
-        "Metadata": {
-          "aws:asset:path": "./src",
-          "aws:asset:property": "Code"
+    "deploymentBucketName": {
+      "Type": "String"
+    },
+    "s3Key": {
+      "Type": "String"
+    },
+    "resMAPSMAPSQueueKeyId": {
+      "Type": "String"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
         },
-        "Properties": {
-          "Handler": "lambda_function.lambda_handler",
-          "FunctionName": {
-            "Fn::If": [
-              "ShouldNotCreateEnvResources",
-              "MAPSDeleteFolderHandler",
-              {
-                "Fn::Join": [
-                  "",
-                  [
-                    "MAPSDeleteFolderHandler",
-                    "-",
-                    {
-                      "Ref": "env"
-                    }
-                  ]
-                ]
-              }
-            ]
-          },
-          "Environment": {
-            "Variables": {
-              "ENV": {
-                "Ref": "env"
-              },
-              "REGION": {
-                "Ref": "AWS::Region"
-              },
-              "PERMISSIONS_DB_TABLE": {
-                "Ref": "tablesMAPSTablesMAPSFolderPermissionsTable"
-              }
-            }
-          },
-          "Role": {
-            "Fn::GetAtt": [
-              "LambdaExecutionRole",
-              "Arn"
-            ]
-          },
-          "Runtime": "python3.8",
-          "Layers": [],
-          "Timeout": "25",
-          "Code": {
-            "S3Bucket": {
-              "Ref": "deploymentBucketName"
-            },
-            "S3Key": {
-              "Ref": "s3Key"
-            }
-          }
-        }
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Metadata": {
+        "aws:asset:path": "./src",
+        "aws:asset:property": "Code"
       },
-      "LambdaExecutionRole": {
-        "Type": "AWS::IAM::Role",
-        "Properties": {
-          "RoleName": {
-            "Fn::If": [
-              "ShouldNotCreateEnvResources",
-              "mapsLambdaRolef5eb61f7",
-              {
-                "Fn::Join": [
-                  "",
-                  [
-                    "mapsLambdaRolef5eb61f7",
-                    "-",
-                    {
-                      "Ref": "env"
-                    }
-                  ]
-                ]
-              }
-            ]
-          },
-          "AssumeRolePolicyDocument": {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Principal": {
-                  "Service": [
-                    "lambda.amazonaws.com"
-                  ]
-                },
-                "Action": [
-                  "sts:AssumeRole"
-                ]
-              }
-            ]
-          }
-        }
-      },
-      "lambdaexecutionpolicy": {
-        "DependsOn": [
-          "LambdaExecutionRole"
-        ],
-        "Type": "AWS::IAM::Policy",
-        "Properties": {
-          "PolicyName": "lambda-execution-policy",
-          "Roles": [
+      "Properties": {
+        "Handler": "lambda_function.lambda_handler",
+        "FunctionName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "MAPSDeleteFolderHandler",
             {
-              "Ref": "LambdaExecutionRole"
+              "Fn::Join": [
+                "",
+                [
+                  "MAPSDeleteFolderHandler",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
             }
-          ],
-          "PolicyDocument": {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Action": [
-                  "logs:CreateLogGroup",
-                  "logs:CreateLogStream",
-                  "logs:PutLogEvents"
-                ],
-                "Resource": {
-                  "Fn::Sub": [
-                    "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
-                    {
-                      "region": {
-                        "Ref": "AWS::Region"
-                      },
-                      "account": {
-                        "Ref": "AWS::AccountId"
-                      },
-                      "lambda": {
-                        "Ref": "LambdaFunction"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "Effect": "Allow",
-                "Action": "dynamodb:DeleteItem",
-                "Resource": {
-                  "Fn::Sub": [
-                    "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${permtable}",
-                    {
-                      "permtable": {
-                        "Ref": "tablesMAPSTablesMAPSFolderPermissionsTable"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+          ]
+        },
+        "Environment": {
+          "Variables": {
+            "ENV": {
+              "Ref": "env"
+            },
+            "REGION": {
+              "Ref": "AWS::Region"
+            },
+            "PERMISSIONS_DB_TABLE": {
+              "Ref": "tablesMAPSTablesMAPSFolderPermissionsTable"
+            }
           }
-        }
-      }
-    },
-    "Outputs": {
-      "Name": {
-        "Value": {
-          "Ref": "LambdaFunction"
-        }
-      },
-      "Arn": {
-        "Value": {
+        },
+        "Role": {
           "Fn::GetAtt": [
-            "LambdaFunction",
+            "LambdaExecutionRole",
             "Arn"
           ]
+        },
+        "Runtime": "python3.8",
+        "Layers": [],
+        "Timeout": "25",
+        "Code": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": {
+            "Ref": "s3Key"
+          }
         }
-      },
-      "Region": {
-        "Value": {
-          "Ref": "AWS::Region"
+      }
+    },
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "mapsLambdaRolef5eb61f7",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "mapsLambdaRolef5eb61f7",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
         }
-      },
-      "LambdaExecutionRole": {
-        "Value": {
-          "Ref": "LambdaExecutionRole"
+      }
+    },
+    "lambdaexecutionpolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
+                  {
+                    "region": {
+                      "Ref": "AWS::Region"
+                    },
+                    "account": {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "lambda": {
+                      "Ref": "LambdaFunction"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": "dynamodb:DeleteItem",
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${permtable}",
+                  {
+                    "permtable": {
+                      "Ref": "tablesMAPSTablesMAPSFolderPermissionsTable"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "kms:Decrypt"
+              ],
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${KeyId}",
+                  {
+                    "KeyId": {
+                      "Ref": "resMAPSMAPSQueueKeyId"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
         }
       }
     }
+  },
+  "Outputs": {
+    "Name": {
+      "Value": {
+        "Ref": "LambdaFunction"
+      }
+    },
+    "Arn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaFunction",
+          "Arn"
+        ]
+      }
+    },
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    },
+    "LambdaExecutionRole": {
+      "Value": {
+        "Ref": "LambdaExecutionRole"
+      }
+    }
   }
+}
