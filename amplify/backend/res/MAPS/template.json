@@ -173,6 +173,7 @@
 
         "SSMOutputBucket": {
             "Type": "AWS::S3::Bucket",
+            "DeletionPolicy": "Retain",
             "Properties": {
                 "BucketName": {
                     "Fn::Sub": [
@@ -184,18 +185,31 @@
                         }
                     ]
                 },
+                "BucketEncryption": {
+                    "ServerSideEncryptionConfiguration": [
+                        {
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "AES256"
+                            }
+                        }
+                    ]
+                },
                 "AccessControl": "Private",
                 "PublicAccessBlockConfiguration": {
                     "BlockPublicAcls" : "TRUE",
                     "BlockPublicPolicy" : "TRUE",
                     "IgnorePublicAcls" : "TRUE",
                     "RestrictPublicBuckets" : "TRUE"
+                },
+                "VersioningConfiguration": {
+                    "Status": "Enabled"
                 }
             }
         },
 
         "MediaMetadataBucket": {
             "Type": "AWS::S3::Bucket",
+            "DeletionPolicy": "Retain",
             "Properties": {
                 "BucketName": {
                     "Fn::Sub": [
@@ -207,12 +221,24 @@
                         }
                     ]
                 },
+                "BucketEncryption": {
+                    "ServerSideEncryptionConfiguration": [
+                        {
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "AES256"
+                            }
+                        }
+                    ]
+                },
                 "AccessControl": "Private",
                 "PublicAccessBlockConfiguration": {
                     "BlockPublicAcls" : "TRUE",
                     "BlockPublicPolicy" : "TRUE",
                     "IgnorePublicAcls" : "TRUE",
                     "RestrictPublicBuckets" : "TRUE"
+                },
+                "VersioningConfiguration": {
+                    "Status": "Enabled"
                 }
             }
         },
@@ -223,6 +249,7 @@
                 "MAPSQueuePolicy",
                 "S3EventNotificationPermission"
             ],
+            "DeletionPolicy": "Retain",
             "Properties": {
                 "BucketName": {
                     "Fn::Sub": [
@@ -230,6 +257,15 @@
                         {
                             "env": {
                                 "Ref": "env"
+                            }
+                        }
+                    ]
+                },
+                "BucketEncryption": {
+                    "ServerSideEncryptionConfiguration": [
+                        {
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "AES256"
                             }
                         }
                     ]
@@ -311,6 +347,9 @@
                     "BlockPublicPolicy" : "TRUE",
                     "IgnorePublicAcls" : "TRUE",
                     "RestrictPublicBuckets" : "TRUE"
+                },
+                "VersioningConfiguration": {
+                    "Status": "Enabled"
                 }
             }
         }
