@@ -13,7 +13,7 @@
     "bootstrap": "^4.4.1",
     "file-saver": "^2.0.2",
     "history": "^5.0.0",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "moment-timezone": "^0.5.28",
     "normalize-url": ">=4.5.1",
     "postcss": "^8.2.10",
