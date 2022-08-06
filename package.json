@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@aws-amplify/ui-react": "^3.3.0",
     "@material-ui/core": "^4.9.11",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.50",
     "ansi-regex": "^5.0.1",
     "aws-amplify": "^4.3.30",
-    "aws-amplify-react": "^5.1.9",
     "aws-sdk": "^2.1189.0",
     "bootstrap": "^4.4.1",
     "file-saver": "^2.0.2",
