@@ -16,7 +16,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import React from 'react';
-import { fade, withStyles } from '@material-ui/core/styles';
+import { alpha, withStyles } from '@material-ui/core/styles';
 
 import Checkbox from '@material-ui/core/Checkbox';
 import InputBase from '@material-ui/core/InputBase';
@@ -57,7 +57,7 @@ const BootstrapInput = withStyles((theme) => ({
       //margin: '10px',
       transition: theme.transitions.create(['border-color', 'box-shadow']),
       '&:focus': {
-        boxShadow: `${fade('#17a2b8', 0.25)} 0 0 0 0.2rem`,
+        boxShadow: `${alpha('#17a2b8', 0.25)} 0 0 0 0.2rem`,
         borderColor: '#17a2b8',
       },
     }

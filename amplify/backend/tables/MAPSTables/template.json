@@ -1,105 +1,103 @@
 {
-    "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "MAPS Tables Stack.",
-    "Parameters": {
-        "env": {
-            "Type": "String"
-        }
-    },
-    "Conditions": {
-        "ShouldNotCreateEnvResources": {
-            "Fn::Equals": [
-                {
-                    "Ref": "env"
-                },
-                "NONE"
-            ]
-        }
-    },
-    "Resources": {
-        "MAPSFolderPermissionTable": {
-            "Type": "AWS::DynamoDB::Table",
-            "Properties": {
-                "AttributeDefinitions" : [
-                    {
-                      "AttributeName" : "bucket",
-                      "AttributeType" : "S"   
-                    },
-                    {
-                      "AttributeName" : "folderKey",
-                      "AttributeType" : "S"
-                    }
-                ],
-                "KeySchema" : [
-                    {
-                      "AttributeName" : "bucket",
-                      "KeyType" : "HASH"
-                    },
-                    {
-                      "AttributeName" : "folderKey",
-                      "KeyType" : "RANGE"
-                    }
-                ],
-                "ProvisionedThroughput" : {
-                    "ReadCapacityUnits" : "5",
-                    "WriteCapacityUnits" : "5"
-                },
-                "TableName" : {
-                    "Fn::Sub": [
-                        "MAPSFolderPermissions-${env}",
-                        {
-                           "env":{
-                              "Ref":"env"
-                           }
-                        }
-                    ]
-                }
-            }
-        },
-
-        "MAPSAssetDetailsTable": {
-            "Type": "AWS::DynamoDB::Table",
-            "Properties": {
-                "AttributeDefinitions" : [
-                    {
-                      "AttributeName" : "bucketObjKey",
-                      "AttributeType" : "S"   
-                    }
-                ],
-                "KeySchema" : [
-                    {
-                      "AttributeName" : "bucketObjKey",
-                      "KeyType" : "HASH"
-                    }
-                ],
-                "ProvisionedThroughput" : {
-                    "ReadCapacityUnits" : "5",
-                    "WriteCapacityUnits" : "5"
-                },
-                "TableName": {
-                    "Fn::Sub": [
-                        "MAPSAssetDetailsTable-${env}",
-                        {
-                            "env":{
-                               "Ref":"env"
-                            }
-                         }
-                    ]
-                }
-            }
-        }        
-    },
-
-    "Outputs": {
-        "MAPSFolderPermissionsTable": {
-            "Value": {
-                "Ref": "MAPSFolderPermissionTable"
-            }
-        },
-        "MAPSAssetDetailsTable": {
-            "Value": {
-                "Ref": "MAPSAssetDetailsTable"
-            }
-        }
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.0.0\",\"stackType\":\"tables-DyanmoDB\",\"metadata\":{}}",
+  "Parameters": {
+    "env": {
+      "Type": "String"
     }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "MAPSFolderPermissionTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "bucket",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "folderKey",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "bucket",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "folderKey",
+            "KeyType": "RANGE"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "5",
+          "WriteCapacityUnits": "5"
+        },
+        "TableName": {
+          "Fn::Sub": [
+            "MAPSFolderPermissions-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MAPSAssetDetailsTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "bucketObjKey",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "bucketObjKey",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "5",
+          "WriteCapacityUnits": "5"
+        },
+        "TableName": {
+          "Fn::Sub": [
+            "MAPSAssetDetailsTable-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "MAPSFolderPermissionsTable": {
+      "Value": {
+        "Ref": "MAPSFolderPermissionTable"
+      }
+    },
+    "MAPSAssetDetailsTable": {
+      "Value": {
+        "Ref": "MAPSAssetDetailsTable"
+      }
+    }
+  }
 }

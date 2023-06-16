@@ -17,7 +17,7 @@
  */
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import Amplify from 'aws-amplify';
+import { Amplify } from 'aws-amplify';
 import awsmobile from '../../aws-exports';
 import { makeStyles } from '@material-ui/core/styles';
 

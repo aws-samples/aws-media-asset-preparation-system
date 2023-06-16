@@ -3,16 +3,19 @@ backend:
   phases:
     preBuild:
       commands:
-        - npm install -g @aws-amplify/cli@4.52.0
+        - npm install -g @aws-amplify/cli@12.0.0
         - export BASE_PATH=$(pwd)
-        - yum install -y gcc openssl-devel bzip2-devel libffi-devel python3.8-pip
-        - cd /opt && wget https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tgz
-        - cd /opt && tar xzf Python-3.8.2.tgz 
-        - cd /opt/Python-3.8.2 && ./configure --enable-optimizations
-        - cd /opt/Python-3.8.2 && make altinstall
-        - pip3.8 install --user pipenv
-        - ln -fs /usr/local/bin/python3.8 /usr/bin/python3
-        - ln -fs /usr/local/bin/pip3.8 /usr/bin/pip3
+        - yum install -y gcc openssl-devel bzip2-devel libffi-devel python3.9-pip python3.7-pip
+        - cd /opt && wget https://www.python.org/ftp/python/3.9.6/Python-3.9.6.tgz && wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tgz
+        - cd /opt && tar xzf Python-3.9.6.tgz && tar xzf Python-3.7.5.tgz 
+        - cd /opt/Python-3.9.6 && ./configure --enable-optimizations
+        - cd /opt/Python-3.9.6 && make altinstall
+        - pip3.9 install --user pipenv
+        - cd /opt/Python-3.7.5 && ./configure --enable-optimizations
+        - cd /opt/Python-3.7.5 && make altinstall
+        - pip3.7 install --user pipenv
+        - ln -fs /usr/local/bin/python3.9 /usr/bin/python3
+        - ln -fs /usr/local/bin/pip3.9 /usr/bin/pip3
         - cd $BASE_PATH
     build:
       commands:

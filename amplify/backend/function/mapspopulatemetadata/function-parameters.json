@@ -1,0 +1,11 @@
+{
+  "lambdaLayers": [
+    {
+      "type": "ProjectLayer",
+      "resourceName": "MAPSMediaInfoLayer",
+      "version": "Always choose latest version",
+      "isLatestVersionSelected": true,
+      "env": "test"
+    }
+  ]
+}

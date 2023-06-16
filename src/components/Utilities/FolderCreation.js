@@ -21,7 +21,7 @@ import clsx from 'clsx';
 import AWS from 'aws-sdk';
 import awsmobile from '../../aws-exports';
 import { makeStyles } from '@material-ui/core/styles';
-import Amplify, { Auth } from 'aws-amplify';
+import { Amplify, Auth } from 'aws-amplify';
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';

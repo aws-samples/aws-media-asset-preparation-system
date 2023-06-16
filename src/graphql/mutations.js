@@ -1,8 +1,8 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const createMapsAssets = /* GraphQL */ `
-  mutation CreateMapsAssets(
+export const createMAPSAssets = /* GraphQL */ `
+  mutation CreateMAPSAssets(
     $input: CreateMAPSAssetsInput!
     $condition: ModelMAPSAssetsConditionInput
   ) {
@@ -28,8 +28,8 @@ export const createMapsAssets = /* GraphQL */ `
     }
   }
 `;
-export const updateMapsAssets = /* GraphQL */ `
-  mutation UpdateMapsAssets(
+export const updateMAPSAssets = /* GraphQL */ `
+  mutation UpdateMAPSAssets(
     $input: UpdateMAPSAssetsInput!
     $condition: ModelMAPSAssetsConditionInput
   ) {
@@ -55,8 +55,8 @@ export const updateMapsAssets = /* GraphQL */ `
     }
   }
 `;
-export const deleteMapsAssets = /* GraphQL */ `
-  mutation DeleteMapsAssets(
+export const deleteMAPSAssets = /* GraphQL */ `
+  mutation DeleteMAPSAssets(
     $input: DeleteMAPSAssetsInput!
     $condition: ModelMAPSAssetsConditionInput
   ) {
