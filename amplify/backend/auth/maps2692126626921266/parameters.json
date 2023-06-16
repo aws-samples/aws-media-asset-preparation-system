@@ -1,0 +1,84 @@
+{
+  "identityPoolName": "maps26921266_identitypool_26921266",
+  "allowUnauthenticatedIdentities": false,
+  "resourceNameTruncated": "maps26921266",
+  "userPoolName": "maps26921266_userpool_26921266",
+  "autoVerifiedAttributes": [
+    "email"
+  ],
+  "mfaConfiguration": "OFF",
+  "mfaTypes": [
+    "SMS Text Message"
+  ],
+  "smsAuthenticationMessage": "Your authentication code is {####}",
+  "smsVerificationMessage": "Your verification code is {####}",
+  "emailVerificationSubject": "Your verification code",
+  "emailVerificationMessage": "Your verification code is {####}",
+  "defaultPasswordPolicy": false,
+  "passwordPolicyMinLength": 8,
+  "passwordPolicyCharacters": [],
+  "requiredAttributes": [
+    "email"
+  ],
+  "aliasAttributes": [],
+  "userpoolClientGenerateSecret": false,
+  "userpoolClientRefreshTokenValidity": 30,
+  "userpoolClientWriteAttributes": [
+    "email"
+  ],
+  "userpoolClientReadAttributes": [
+    "email"
+  ],
+  "userpoolClientLambdaRole": "maps2626921266_userpoolclient_lambda_role",
+  "userpoolClientSetAttributes": false,
+  "sharedId": "26921266",
+  "resourceName": "maps2692126626921266",
+  "authSelections": "identityPoolAndUserPool",
+  "useDefault": "manual",
+  "thirdPartyAuth": false,
+  "userPoolGroups": true,
+  "adminQueries": false,
+  "triggers": "{\"PostConfirmation\":[\"add-to-group\"]}",
+  "hostedUI": false,
+  "userPoolGroupList": [
+    "admin",
+    "editors"
+  ],
+  "serviceName": "Cognito",
+  "usernameCaseSensitive": false,
+  "useEnabledMfas": true,
+  "authRoleArn": {
+    "Fn::GetAtt": [
+      "AuthRole",
+      "Arn"
+    ]
+  },
+  "unauthRoleArn": {
+    "Fn::GetAtt": [
+      "UnauthRole",
+      "Arn"
+    ]
+  },
+  "breakCircularDependency": true,
+  "dependsOn": [
+    {
+      "category": "function",
+      "resourceName": "maps2692126626921266PostConfirmation",
+      "triggerProvider": "Cognito",
+      "attributes": [
+        "Arn",
+        "Name"
+      ]
+    }
+  ],
+  "permissions": [
+    "{\"policyName\":\"AddToGroupCognito\",\"trigger\":\"PostConfirmation\",\"effect\":\"Allow\",\"actions\":[\"cognito-idp:AdminAddUserToGroup\",\"cognito-idp:GetGroup\",\"cognito-idp:CreateGroup\"],\"resource\":{\"paramType\":\"!GetAtt\",\"keys\":[\"UserPool\",\"Arn\"]}}"
+  ],
+  "authTriggerConnections": [
+    "{\"triggerType\":\"PostConfirmation\",\"lambdaFunctionName\":\"maps2692126626921266PostConfirmation\"}"
+  ],
+  "authProviders": [],
+  "parentStack": {
+    "Ref": "AWS::StackId"
+  }
+}

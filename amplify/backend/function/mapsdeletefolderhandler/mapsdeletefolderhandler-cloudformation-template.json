@@ -1,14 +1,14 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.0.0\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
   "Parameters": {
-    "env": {
-      "Type": "String"
-    },
     "tablesMAPSTablesMAPSFolderPermissionsTable": {
       "Type": "String"
     },
     "deploymentBucketName": {
+      "Type": "String"
+    },
+    "env": {
       "Type": "String"
     },
     "s3Key": {
@@ -33,16 +33,24 @@
         "aws:asset:property": "Code"
       },
       "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": {
+            "Ref": "s3Key"
+          }
+        },
         "Handler": "lambda_function.lambda_handler",
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "MAPSDeleteFolderHandler",
+            "mapsdeletefolderhandler",
             {
               "Fn::Join": [
                 "",
                 [
-                  "MAPSDeleteFolderHandler",
+                  "mapsdeletefolderhandler",
                   "-",
                   {
                     "Ref": "env"
@@ -71,17 +79,9 @@
             "Arn"
           ]
         },
-        "Runtime": "python3.8",
+        "Runtime": "python3.9",
         "Layers": [],
-        "Timeout": "25",
-        "Code": {
-          "S3Bucket": {
-            "Ref": "deploymentBucketName"
-          },
-          "S3Key": {
-            "Ref": "s3Key"
-          }
-        }
+        "Timeout": 25
       }
     },
     "LambdaExecutionRole": {
@@ -90,12 +90,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "mapsLambdaRolef5eb61f7",
+            "mapsLambdaRolee152ede0",
             {
               "Fn::Join": [
                 "",
                 [
-                  "mapsLambdaRolef5eb61f7",
+                  "mapsLambdaRolee152ede0",
                   "-",
                   {
                     "Ref": "env"
@@ -203,6 +203,14 @@
     "LambdaExecutionRole": {
       "Value": {
         "Ref": "LambdaExecutionRole"
+      }
+    },
+    "LambdaExecutionRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaExecutionRole",
+          "Arn"
+        ]
       }
     }
   }

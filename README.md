@@ -11,9 +11,9 @@ Before you deploy, you must have the following in place:
 * [AWS Account](https://aws.amazon.com/account/)
 * Code repository (e.g. [GitHub](https://github.com/), [AWS CodeCommit](https://aws.amazon.com/codecommit/), [Bitbucket](https://bitbucket.org/product))
 > If you plan to modify the code base, you will also need the following
-* [Node 10 or greater](https://nodejs.org/en/download/)
-* [Amplify CLI 4.52.0 installed and configured](https://aws-amplify.github.io/docs/cli-toolchain/quickstart#quickstart)
-* [Python version 3.6 or greater](https://www.python.org/downloads/)
+* [Node 16 or greater](https://nodejs.org/en/download/)
+* [Amplify CLI 12.0.0 installed and configured](https://aws-amplify.github.io/docs/cli-toolchain/quickstart#quickstart)
+* [Python version 3.7 or greater](https://www.python.org/downloads/)
 
 ## Deploy the App
 
@@ -42,14 +42,22 @@ To automatically deploy the app, click the big orange button 👇
 ? Choose your default editor: <YOUR_EDITOR_OF_CHOICE>
 ? Do you want to use an AWS profile? Y
 ? Enter the name of the group to which users will be added. editors
-Adding Lambda layer MAPSMediaInfoLambdaLayer to dev environment.
-? Choose the environment to import the layer access settings from: (Use arrow keys)
-❯ Apply default access (Only this AWS account) 
+✅ Initialized your environment successfully.
+
+Your project has been successfully initialized and connected to the cloud!
 
 ~ amplify push
 ? Are you sure you want to continue? Y
+✅ GraphQL schema compiled successfully.
+
+Suggested configuration for new layer versions:
+
+MAPSMediaInfoLayer
+  - Description: Updated layer version  XXXX-XX-XXXXX:XX:XX.XXXX
+
+? Accept the suggested layer version configurations? Y
+
 ? Do you want to generate code for your newly created GraphQL API? N
-> We already have the GraphQL code generated for this project, so generating it here is not necessary.
 ```
 
 ### Deploy the front end
@@ -70,12 +78,9 @@ Adding Lambda layer MAPSMediaInfoLambdaLayer to dev environment.
 Once MAPS is deployed, follow the [Getting Started](./docs/GettingStarted.md) guide to begin preparing media assets.
 
 
-## Contributors
+## Maintainer
 
-Matt Herson  
-Brandon Lindauer  
-Mario Monello  
-Kim Wendt  
+Kim Wendt
 
 
 ## License

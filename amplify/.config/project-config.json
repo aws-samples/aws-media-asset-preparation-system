@@ -1,6 +1,6 @@
 {
     "projectName": "MAPS",
-    "version": "3.0",
+    "version": "4.0",
     "frontend": "javascript",
     "javascript": {
         "framework": "react",

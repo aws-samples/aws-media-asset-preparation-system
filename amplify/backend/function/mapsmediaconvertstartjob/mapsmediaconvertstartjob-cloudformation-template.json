@@ -1,8 +1,14 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.0.0\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
   "Parameters": {
+    "deploymentBucketName": {
+      "Type": "String"
+    },
     "env": {
+      "Type": "String"
+    },
+    "s3Key": {
       "Type": "String"
     },
     "apiMAPSMediaAssetAPIGraphQLAPIEndpointOutput": {
@@ -23,13 +29,7 @@
     "tablesMAPSTablesMAPSAssetDetailsTable": {
       "Type": "String"
     },
-    "authmapsauthcontrolsUserPoolId": {
-      "Type": "String"
-    },
-    "deploymentBucketName": {
-      "Type": "String"
-    },
-    "s3Key": {
+    "authmaps2692126626921266UserPoolId": {
       "Type": "String"
     },
     "resMAPSMAPSQueueKeyId": {
@@ -122,6 +122,14 @@
         "aws:asset:property": "Code"
       },
       "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": {
+            "Ref": "s3Key"
+          }
+        },
         "Handler": "lambda_function.lambda_handler",
         "FunctionName": {
           "Fn::If": [
@@ -165,7 +173,7 @@
               "Ref": "tablesMAPSTablesMAPSFolderPermissionsTable"
             },
             "COGNITO_USER_POOL": {
-              "Ref": "authmapsauthcontrolsUserPoolId"
+              "Ref": "authmaps2692126626921266UserPoolId"
             },
             "GQL_API_ID": {
               "Ref": "apiMAPSMediaAssetAPIGraphQLAPIIdOutput"
@@ -181,17 +189,9 @@
             "Arn"
           ]
         },
-        "Runtime": "python3.8",
+        "Runtime": "python3.9",
         "Layers": [],
-        "Timeout": "900",
-        "Code": {
-          "S3Bucket": {
-            "Ref": "deploymentBucketName"
-          },
-          "S3Key": {
-            "Ref": "s3Key"
-          }
-        }
+        "Timeout": 900
       }
     },
     "LambdaExecutionRole": {
@@ -200,12 +200,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "mapsLambdaRole7b00c1d1",
+            "mapsLambdaRolefc54b0f6",
             {
               "Fn::Join": [
                 "",
                 [
-                  "mapsLambdaRole7b00c1d1",
+                  "mapsLambdaRolefc54b0f6",
                   "-",
                   {
                     "Ref": "env"
@@ -350,7 +350,7 @@
                   "arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${userpool}",
                   {
                     "userpool": {
-                      "Ref": "authmapsauthcontrolsUserPoolId"
+                      "Ref": "authmaps2692126626921266UserPoolId"
                     }
                   }
                 ]
@@ -426,6 +426,14 @@
     "LambdaExecutionRole": {
       "Value": {
         "Ref": "LambdaExecutionRole"
+      }
+    },
+    "LambdaExecutionRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaExecutionRole",
+          "Arn"
+        ]
       }
     }
   }

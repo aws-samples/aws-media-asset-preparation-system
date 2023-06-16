@@ -1,8 +1,8 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const listMapsAssets = /* GraphQL */ `
-  query ListMapsAssets(
+export const listMAPSAssets = /* GraphQL */ `
+  query ListMAPSAssets(
     $filter: TableMAPSAssetsFilterInput
     $limit: Int
     $nextToken: String
@@ -32,8 +32,8 @@ export const listMapsAssets = /* GraphQL */ `
     }
   }
 `;
-export const getMapsAssets = /* GraphQL */ `
-  query GetMapsAssets($bucketObjKey: String!) {
+export const getMAPSAssets = /* GraphQL */ `
+  query GetMAPSAssets($bucketObjKey: String!) {
     getMAPSAssets(bucketObjKey: $bucketObjKey) {
       bucketObjKey
       prefixLoc

@@ -15,13 +15,13 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import Amplify, { API, Auth, graphqlOperation } from 'aws-amplify';
+import { Amplify, API, Auth, graphqlOperation } from 'aws-amplify';
 import AWS from 'aws-sdk';
 import { saveAs } from 'file-saver';
 import awsmobile from '../../aws-exports';
 
-import { deleteMapsAssets, createMapsAssets } from '../../graphql/mutations';
-import { getMapsAssets } from '../../graphql/queries';
+import { deleteMAPSAssets, createMAPSAssets } from '../../graphql/mutations';
+import { getMAPSAssets } from '../../graphql/queries';
 
 Amplify.configure(awsmobile);
 const apiName = "MAPSFrontEndAPI";
@@ -64,7 +64,7 @@ async function DeleteObjectRequest(bucketName, key, alertHandler) {
                         bucketObjKey: `${bucketName}/${key}`
                     }
                 };
-                API.graphql(graphqlOperation(deleteMapsAssets, deleteObj));
+                API.graphql(graphqlOperation(deleteMAPSAssets, deleteObj));
             })
             .catch((err) => {
                 console.log(err);
@@ -173,14 +173,14 @@ async function RenameMoveObjRequest(bucketName, keys, newPrefix, alertHandler) {
                         } 
                     };
 
-                    API.graphql(graphqlOperation(getMapsAssets, oldObject['input']))
+                    API.graphql(graphqlOperation(getMAPSAssets, oldObject['input']))
                     .then((getObjRes) => {
                         let createObj = getObjRes.data.getMAPSAssets;
                         createObj['bucketObjKey'] = `${bucketName}/${obj['newKey']}`;
                         createObj['prefixLoc'] = newPrefix === '' ? '/' : newPrefix;
 
-                        API.graphql(graphqlOperation(createMapsAssets, { input: createObj }));
-                        API.graphql(graphqlOperation(deleteMapsAssets, oldObject));
+                        API.graphql(graphqlOperation(createMAPSAssets, { input: createObj }));
+                        API.graphql(graphqlOperation(deleteMAPSAssets, oldObject));
                     })
                     .catch((getObjErr) => {
                         console.log("Something bad happened in object get", getObjErr);
