@@ -12,7 +12,7 @@ Before you deploy, you must have the following in place:
 * Code repository (e.g. [GitHub](https://github.com/), [AWS CodeCommit](https://aws.amazon.com/codecommit/), [Bitbucket](https://bitbucket.org/product))
 > If you plan to modify the code base, you will also need the following
 * [Node 16 or greater](https://nodejs.org/en/download/)
-* [Amplify CLI 12.0.0 installed and configured](https://aws-amplify.github.io/docs/cli-toolchain/quickstart#quickstart)
+* [Amplify CLI 12.1.1 installed and configured](https://aws-amplify.github.io/docs/cli-toolchain/quickstart#quickstart)
 * [Python version 3.7 or greater](https://www.python.org/downloads/)
 
 ## Deploy the App
