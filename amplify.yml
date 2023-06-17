@@ -24,7 +24,7 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm ci
+        - npm install
         - npm install react-scripts
     build:
       commands:
