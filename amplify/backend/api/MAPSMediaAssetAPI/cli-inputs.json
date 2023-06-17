@@ -1,0 +1,20 @@
+{
+    "version": 1,
+    "serviceConfiguration": {
+      "serviceName": "AppSync",
+      "defaultAuthType": {
+        "mode": "AMAZON_COGNITO_USER_POOLS",
+        "cognitoUserPoolId": "authmaps2692126626921266"
+      },
+      "additionalAuthTypes": [
+        {
+          "mode": "API_KEY",
+          "expirationTime": 90,
+          "apiKeyExpirationDate": "2023-09-15T01:59:04.344Z",
+          "keyDescription": "API Key for Lambdas"
+        }
+      ],
+      "conflictResolution": {},
+      "apiName": "MAPSMediaAssetAPI"
+    }
+  }
