@@ -4,7 +4,7 @@ backend:
     preBuild:
       commands:
         - export BASE_PATH=$(pwd)
-        - yum install -y gcc openssl-devel bzip2-devel libffi-devel python3.9-pip python3.7-pip
+        - sudo yum install -y gcc openssl-devel bzip2-devel libffi-devel python3.9-pip python3.7-pip
         - cd /opt && wget https://www.python.org/ftp/python/3.9.6/Python-3.9.6.tgz && wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tgz
         - cd /opt && tar xzf Python-3.9.6.tgz && tar xzf Python-3.7.5.tgz 
         - cd /opt/Python-3.9.6 && ./configure --enable-optimizations
